@@ -1,0 +1,3 @@
+﻿  Player.cpp
+c:\cosas\trabajos\vj\2d\2dgame\02-bubble\02-bubble\player.cpp(26): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
+  02-Bubble.vcxproj -> C:\cosas\trabajos\vj\2d\2DGame\02-Bubble\Debug\02-Bubble.exe
