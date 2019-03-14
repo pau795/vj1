@@ -1,0 +1,1 @@
+tiles2_01.png.png 43 0, tiles2_02.png.png 64 0, tiles2_03.png.png 72 0, tiles2_04.png.png 80 0, tiles2_05.png.png 110 0, tiles2_06.png.png 162 2, tiles2_07.png.png 194 2, tiles2_08.png.png 148 68, tiles2_09.png.png 182 70, tiles2_10.png.png 145 81, tiles2_11.png.png 182 86, tiles2_12.png.png 0 0.
