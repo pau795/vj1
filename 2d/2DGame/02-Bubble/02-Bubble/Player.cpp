@@ -26,7 +26,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	float spriteSizeTexX = 1.0 / 12, spriteSizeTexY = 1.0 / 16;
 	float pixelSizeTexX = spriteSizeTexX / 32, pixelSizeTexY = spriteSizeTexY / 32;
 	spritesheet.loadFromFile("images/sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), glm::vec2(pixelSizeTexX*(PLAYER_SIZE_X), pixelSizeTexY*(PLAYER_SIZE_Y+1)), &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), glm::vec2(pixelSizeTexX*(PLAYER_SIZE_X), pixelSizeTexY*(PLAYER_SIZE_Y)), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(12);
 	float offsetX = pixelSizeTexX * 6, offsetY = pixelSizeTexY * 2;
 
@@ -157,19 +157,17 @@ void Player::update(int deltaTime)
 	}
 	bJumping = true;
 	posCharacter.y += fall_step;
+	if (map->collisionMoveDown(posCharacter, glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), &posCharacter.y)) {
+		bJumping = false;
+		changeLandingSprite();
+		if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) flipGravity();
+	}
+	else if (map->collisionMoveUp(posCharacter, glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), &posCharacter.y)) {
+		bJumping = false;
+		changeLandingSprite();
+		if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) flipGravity();
+	}
 		
-		if (map->collisionMoveUp(posCharacter, glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y))) {
-			bJumping = false;
-			changeLandingSprite();
-			posCharacter.y += -fall_step;
-			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) flipGravity();
-		}
-		else if (map->collisionMoveDown(posCharacter, glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y))) {
-			bJumping = false;
-			posCharacter.y += -fall_step;
-			changeLandingSprite();
-			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) flipGravity();
-		}
 	
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posCharacter.x), float(tileMapDispl.y + posCharacter.y)));
 }
