@@ -1,8 +1,14 @@
 #include <iostream>
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include "Scene.h"
 #include "Game.h"
+#include "Enemy.h"
+#include "EnemyVer.h"
+#include "EnemyHor.h"
 
 
 #define SCREEN_X 0
@@ -26,15 +32,69 @@ Scene::~Scene()
 		delete player;
 }
 
+bool Scene::loadLevel() {
+	ifstream fin;
+	string line;
+	stringstream sstream;
+
+	string file = "levels/data-level";
+	file.append(to_string(levelId));
+	file.append(".txt");
+	fin.open(file.c_str());
+	if (!fin.is_open())
+		return false;
+	getline(fin, line);
+	sstream.str(line);
+
+	//Load Player
+	int animation, iniPosX, iniPosY;
+	sstream >> animation >> iniPosX >> iniPosY;
+	player = new Player();
+	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	player->setPosition(glm::vec2(iniPosX * map->getTileSize(), iniPosY * map->getTileSize()));
+	player->setTileMap(map);
+	(player)->sprite->changeAnimation(animation);
+
+	//Load Enemies
+
+	getline(fin, line);
+	sstream.str(line);
+	int numEnemies;
+	sstream >> numEnemies;
+	enemies.clear();
+	enemies.resize(numEnemies);
+	for (int i = 0; i < numEnemies; ++i) {
+		getline(fin, line);
+		sstream.str(line);
+		int id, type, speed, p1x, p1y, p2x, p2y;
+		sstream >> id >> type >> speed >> p1x >> p1y >> p2x >> p2y;
+		Enemy *e;
+		if (type == 0) {
+			e = new EnemyHor();
+			e->setTileMap(map);
+			e->setPatrolPoints(p1x, p2x);
+		}
+		else {
+			e = new EnemyVer();
+			e->setTileMap(map);
+			e->setPatrolPoints(p1y, p2y);
+		}
+		e->init(id, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		e->setPosition(glm::vec2(p1x * map->getTileSize(), p1y * map->getTileSize()));
+		e->setSpeed(speed);
+		enemies[i] = e;
+	}
+}
 
 void Scene::init()
 {
 	initShaders();
-	map = TileMap::createTileMap("levels/level1.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-	player = new Player();
-	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
-	player->setTileMap(map);
+	levelId = 1;
+	string file = "levels/level";
+	file.append(to_string(levelId));
+	file.append(".txt");
+	map = TileMap::createTileMap(file, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	loadLevel();
 	projection = glm::ortho(0.f, float(320- 1), float(240 - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -43,6 +103,7 @@ void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
 	player->update(deltaTime);
+	for (int i = 0; i < enemies.size(); ++i) enemies[i]->update(deltaTime);
 }
 
 void Scene::render()
@@ -57,6 +118,7 @@ void Scene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 	map->render();
 	player->render();
+	for (int i = 0; i < enemies.size(); ++i) enemies[i]->render();
 }
 
 void Scene::initShaders()

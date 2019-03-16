@@ -19,7 +19,7 @@ class Scene
 public:
 	Scene();
 	~Scene();
-
+	bool loadLevel();
 	void init();
 	void update(int deltaTime);
 	void render();
@@ -30,10 +30,11 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	vector<Enemy> enemies;
+	vector<Enemy*> enemies;
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
+	int levelId;
 
 };
 

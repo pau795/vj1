@@ -5,5 +5,7 @@ class EnemyHor :
 {
 public:
 	void update(int deltaTime) override;
+
+private:
 };
 

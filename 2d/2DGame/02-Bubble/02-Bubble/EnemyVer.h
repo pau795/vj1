@@ -5,5 +5,7 @@ class EnemyVer :
 {
 public:
 	void update(int deltaTime) override;
+
+private:
 };
 
