@@ -1,5 +1,7 @@
 #include <cmath>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "Player.h"
@@ -8,8 +10,6 @@
 
 using namespace std;
 
-#define PLAYER_SIZE_X 12
-#define PLAYER_SIZE_Y 21
 #define KEY_SPACEBAR 32
 
 enum PlayerAnims
@@ -18,66 +18,57 @@ enum PlayerAnims
 	JUMP_LEFT, JUMP_RIGHT, FLIPPED_JUMP_LEFT, FLIPPED_JUMP_RIGHT
 };
 
+bool Player::loadPlayer(int id, const string &file, ShaderProgram &shaderProgram) {
 
-void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
+
+	ifstream fin;
+	string line;
+	stringstream sstream;
+
+	float spriteSizeTexX = 1.0 / 12, spriteSizeTexY = 1.0 / 16;
+	float pixelSizeTexX = spriteSizeTexX / 32, pixelSizeTexY = spriteSizeTexY / 32;
+	fin.open(file.c_str());
+	if (!fin.is_open())
+		return false;
+	getline(fin, line);
+	sstream.str(line);
+	sstream >> characterSize.x >> characterSize.y >> numAnimations >>offsetX >> offsetY;
+	offsetX *= pixelSizeTexX;
+	offsetY *= pixelSizeTexY;
+	spritesheet.loadFromFile("images/sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite = Sprite::createSprite(glm::ivec2(characterSize.x, characterSize.y), glm::vec2(pixelSizeTexX*(characterSize.x), pixelSizeTexY*(characterSize.y)), &spritesheet, &shaderProgram);
+	sprite->setNumberAnimations(numAnimations);
+
+	for (int i = STAND_LEFT; i < numAnimations; ++i) {
+		getline(fin, line);
+		sstream.str(line);
+		int pos = line.find(" ");
+		int n = stoi(line.substr(0, pos));
+		string framesDescription = line.substr(pos+1, line.length()-1);
+		sprite->setAnimationSpeed(i, n);
+		string delimiter = "-";
+		while (pos != string::npos) {
+			pos = framesDescription.find(delimiter);
+			string frame = framesDescription.substr(0, pos);
+			string frame1 = frame.substr(1, frame.length() - 2);
+			int pos1 = frame1.find(",");
+			string a = frame1.substr(0, pos1), b = frame1.substr(pos1+1, frame1.length()-1);
+			float frameX = stoi(a) * spriteSizeTexX + offsetX, frameY = stoi(b) * spriteSizeTexY + offsetY;
+			sprite->addKeyframe(i, glm::vec2(frameX, frameY));
+			framesDescription.erase(0, pos + delimiter.length());
+		}
+	}
+}
+
+void Player::init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
 	bJumping = false;
 	fall_step = 4;
-	float spriteSizeTexX = 1.0 / 12, spriteSizeTexY = 1.0 / 16;
-	float pixelSizeTexX = spriteSizeTexX / 32, pixelSizeTexY = spriteSizeTexY / 32;
-	spritesheet.loadFromFile("images/sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), glm::vec2(pixelSizeTexX*(PLAYER_SIZE_X), pixelSizeTexY*(PLAYER_SIZE_Y)), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(12);
-	float offsetX = pixelSizeTexX * 6, offsetY = pixelSizeTexY * 2;
-
-		sprite->setAnimationSpeed(STAND_LEFT, 8);
-		sprite->addKeyframe(STAND_LEFT, glm::vec2(3 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		
-		sprite->setAnimationSpeed(STAND_RIGHT, 8);
-		sprite->addKeyframe(STAND_RIGHT, glm::vec2(0 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		
-		sprite->setAnimationSpeed(MOVE_LEFT, 16);
-		sprite->addKeyframe(MOVE_LEFT, glm::vec2(3 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		sprite->addKeyframe(MOVE_LEFT, glm::vec2(4 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		sprite->addKeyframe(MOVE_LEFT, glm::vec2(5 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		
-		sprite->setAnimationSpeed(MOVE_RIGHT, 16);
-		sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		sprite->addKeyframe(MOVE_RIGHT, glm::vec2(1 * spriteSizeTexX +offsetX , 0 * spriteSizeTexY + offsetY));
-		sprite->addKeyframe(MOVE_RIGHT, glm::vec2(2 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-
-		sprite->setAnimationSpeed(FLIPPED_STAND_LEFT, 8);
-		sprite->addKeyframe(FLIPPED_STAND_LEFT, glm::vec2(9 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-
-		sprite->setAnimationSpeed(FLIPPED_STAND_RIGHT, 8);
-		sprite->addKeyframe(FLIPPED_STAND_RIGHT, glm::vec2(6 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-
-		sprite->setAnimationSpeed(FLIPPED_MOVE_LEFT, 16);
-		sprite->addKeyframe(FLIPPED_MOVE_LEFT, glm::vec2(9 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		sprite->addKeyframe(FLIPPED_MOVE_LEFT, glm::vec2(10 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		sprite->addKeyframe(FLIPPED_MOVE_LEFT, glm::vec2(11 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-
-		sprite->setAnimationSpeed(FLIPPED_MOVE_RIGHT, 16);
-		sprite->addKeyframe(FLIPPED_MOVE_RIGHT, glm::vec2(6 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		sprite->addKeyframe(FLIPPED_MOVE_RIGHT, glm::vec2(7 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		sprite->addKeyframe(FLIPPED_MOVE_RIGHT, glm::vec2(8 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-
-		sprite->setAnimationSpeed(JUMP_LEFT, 8);
-		sprite->addKeyframe(JUMP_LEFT, glm::vec2(4 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-
-		sprite->setAnimationSpeed(JUMP_RIGHT, 8);
-		sprite->addKeyframe(JUMP_RIGHT, glm::vec2(1 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-
-		sprite->setAnimationSpeed(FLIPPED_JUMP_LEFT, 8);
-		sprite->addKeyframe(FLIPPED_JUMP_LEFT, glm::vec2(10 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-
-		sprite->setAnimationSpeed(FLIPPED_JUMP_RIGHT, 8);
-		sprite->addKeyframe(FLIPPED_JUMP_RIGHT, glm::vec2(7 * spriteSizeTexX + offsetX, 0 * spriteSizeTexY + offsetY));
-		
+	
+	loadPlayer(id, "data/player.txt", shaderProgram);	
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posCharacter.x), float(tileMapDispl.y + posCharacter.y)));
-	
 }
 
 void Player::changeJumpingSprite() {
@@ -126,7 +117,7 @@ void Player::update(int deltaTime)
 			else if (bJumping && sprite->animation() != FLIPPED_JUMP_LEFT) sprite->changeAnimation(FLIPPED_JUMP_LEFT);
 		}
 		posCharacter.x -= 2;
-		if (map->collisionMoveLeft(posCharacter, glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y)))
+		if (map->collisionMoveLeft(posCharacter, glm::ivec2(characterSize.x, characterSize.y)))
 			posCharacter.x += 2;
 	}
 	else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT))
@@ -140,7 +131,7 @@ void Player::update(int deltaTime)
 			else if (bJumping && sprite->animation() != FLIPPED_JUMP_RIGHT) sprite->changeAnimation(FLIPPED_JUMP_RIGHT);
 		}
 		posCharacter.x += 2;
-		if (map->collisionMoveRight(posCharacter, glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y)))
+		if (map->collisionMoveRight(posCharacter, glm::ivec2(characterSize.x, characterSize.y)))
 			posCharacter.x -= 2;
 	}
 	else
@@ -157,12 +148,12 @@ void Player::update(int deltaTime)
 	}
 	bJumping = true;
 	posCharacter.y += fall_step;
-	if (map->collisionMoveDown(posCharacter, glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), &posCharacter.y)) {
+	if (map->collisionMoveDown(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y)) {
 		bJumping = false;
 		changeLandingSprite();
 		if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) flipGravity();
 	}
-	else if (map->collisionMoveUp(posCharacter, glm::ivec2(PLAYER_SIZE_X, PLAYER_SIZE_Y), &posCharacter.y)) {
+	else if (map->collisionMoveUp(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y)) {
 		bJumping = false;
 		changeLandingSprite();
 		if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) flipGravity();

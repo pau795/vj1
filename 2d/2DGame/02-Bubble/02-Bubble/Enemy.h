@@ -11,8 +11,9 @@ class Enemy :
 	public Character
 {
 public:
-	virtual void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) = 0;
+	virtual void init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) = 0;
 	virtual void update(int deltaTime) = 0;
+	int speed;
 
 private:
 };

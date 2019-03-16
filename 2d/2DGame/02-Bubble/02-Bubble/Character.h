@@ -14,20 +14,22 @@ class Character
 {
 
 public:
-	virtual void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)=0;
+	virtual void init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)=0;
 	virtual void update(int deltaTime)=0;
 	void render();
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
 
-	glm::ivec2 tileMapDispl, posCharacter;
+	glm::ivec2 tileMapDispl, posCharacter, characterSize;
+	int numAnimations;
+
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
+	float offsetX, offsetY;
 	
 private:
-
 };
 
 
