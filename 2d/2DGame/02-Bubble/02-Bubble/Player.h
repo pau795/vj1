@@ -15,7 +15,6 @@ class Player: public Character
 {
 
 public:
-	bool loadPlayer(int id, const string &file, ShaderProgram &shaderProgram);
 	void init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) override;
 	void update(int deltaTime) override;
 	

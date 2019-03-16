@@ -1,7 +1,4 @@
 #include <cmath>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "Player.h"
@@ -18,55 +15,13 @@ enum PlayerAnims
 	JUMP_LEFT, JUMP_RIGHT, FLIPPED_JUMP_LEFT, FLIPPED_JUMP_RIGHT
 };
 
-bool Player::loadPlayer(int id, const string &file, ShaderProgram &shaderProgram) {
 
-
-	ifstream fin;
-	string line;
-	stringstream sstream;
-
-	float spriteSizeTexX = 1.0 / 12, spriteSizeTexY = 1.0 / 16;
-	float pixelSizeTexX = spriteSizeTexX / 32, pixelSizeTexY = spriteSizeTexY / 32;
-	fin.open(file.c_str());
-	if (!fin.is_open())
-		return false;
-	getline(fin, line);
-	sstream.str(line);
-	sstream >> characterSize.x >> characterSize.y >> numAnimations >>offsetX >> offsetY;
-	offsetX *= pixelSizeTexX;
-	offsetY *= pixelSizeTexY;
-	spritesheet.loadFromFile("images/sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(characterSize.x, characterSize.y), glm::vec2(pixelSizeTexX*(characterSize.x), pixelSizeTexY*(characterSize.y)), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(numAnimations);
-
-	for (int i = STAND_LEFT; i < numAnimations; ++i) {
-		getline(fin, line);
-		sstream.str(line);
-		int pos = line.find(" ");
-		int n = stoi(line.substr(0, pos));
-		string framesDescription = line.substr(pos+1, line.length()-1);
-		sprite->setAnimationSpeed(i, n);
-		string delimiter = "-";
-		while (pos != string::npos) {
-			pos = framesDescription.find(delimiter);
-			string frame = framesDescription.substr(0, pos);
-			string frame1 = frame.substr(1, frame.length() - 2);
-			int pos1 = frame1.find(",");
-			string a = frame1.substr(0, pos1), b = frame1.substr(pos1+1, frame1.length()-1);
-			float frameX = stoi(a) * spriteSizeTexX + offsetX, frameY = stoi(b) * spriteSizeTexY + offsetY;
-			sprite->addKeyframe(i, glm::vec2(frameX, frameY));
-			framesDescription.erase(0, pos + delimiter.length());
-		}
-	}
-}
 
 void Player::init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
 	bJumping = false;
 	fall_step = 4;
-	
-	loadPlayer(id, "data/player.txt", shaderProgram);	
-	sprite->changeAnimation(0);
+	loadCharacter(id, "data/player.txt", shaderProgram);	
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posCharacter.x), float(tileMapDispl.y + posCharacter.y)));
 }
