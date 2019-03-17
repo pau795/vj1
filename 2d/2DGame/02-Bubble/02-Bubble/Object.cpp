@@ -1,32 +1,10 @@
-#include <cmath>
-#include <iostream>
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include "Object.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "Player.h"
-#include "Game.h"
 
 
-
-void Character::render()
-{
-	sprite->render();
-}
-
-void Character::setTileMap(TileMap *tileMap)
-{
-	map = tileMap;
-}
-
-void Character::setPosition(const glm::vec2 &pos)
-{
-	posCharacter = pos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posCharacter.x), float(tileMapDispl.y + posCharacter.y)));
-}
-
-bool Character::loadCharacter(int id, const string &file, ShaderProgram &shaderProgram) {
+bool Object::loadObject(int id, const string &file, ShaderProgram &shaderProgram) {
 
 
 	ifstream fin;
@@ -40,15 +18,16 @@ bool Character::loadCharacter(int id, const string &file, ShaderProgram &shaderP
 		return false;
 	getline(fin, line);
 	sstream.str(line);
-	sstream >> characterSize.x >> characterSize.y >> numAnimations >> offsetX >> offsetY;
+	sstream >> ObjectSize.x >> ObjectSize.y >> numAnimations >> offsetX >> offsetY;
 	offsetX *= pixelSizeTexX;
 	offsetY *= pixelSizeTexY;
 	spritesheet.loadFromFile("images/sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(characterSize.x, characterSize.y), glm::vec2(pixelSizeTexX*(characterSize.x), pixelSizeTexY*(characterSize.y)), &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(glm::ivec2(ObjectSize.x, ObjectSize.y), glm::vec2(pixelSizeTexX*(ObjectSize.x), pixelSizeTexY*(ObjectSize.y)), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(numAnimations);
 
 	for (int i = 0; i < numAnimations; ++i) {
 		getline(fin, line);
+		sstream.str(line);
 		int pos = line.find(" ");
 		int n = stoi(line.substr(0, pos));
 		string framesDescription = line.substr(pos + 1, line.length() - 1);
@@ -68,6 +47,18 @@ bool Character::loadCharacter(int id, const string &file, ShaderProgram &shaderP
 	sprite->changeAnimation(0);
 }
 
+void Object::render()
+{
+	sprite->render();
+}
 
+void Object::setTileMap(TileMap *tileMap)
+{
+	map = tileMap;
+}
 
-
+void Object::setPosition(const glm::vec2 &pos)
+{
+	posObject = pos;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posObject.x), float(tileMapDispl.y + posObject.y)));
+}

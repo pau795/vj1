@@ -84,6 +84,24 @@ bool Scene::loadLevel() {
 		e->setSpeed(speed);
 		enemies[i] = e;
 	}
+
+	//Load CheckPoints
+	getline(fin, line);
+	sstream.str(line);
+	int numCheckPoints;
+	sstream >> numCheckPoints;
+	checkPoints.clear();
+	checkPoints.resize(numCheckPoints);
+	for (int i = 0; i < numCheckPoints; ++i) {
+		getline(fin, line);
+		sstream.str(line);
+		int id, x, y;
+		sstream >> id >> x >> y;
+		CheckPoint* c = new CheckPoint();
+		c->init(id, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		c->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		checkPoints[i] = c;
+	}
 }
 
 void Scene::init()
@@ -104,6 +122,7 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	player->update(deltaTime);
 	for (int i = 0; i < enemies.size(); ++i) enemies[i]->update(deltaTime);
+	for (int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->update(deltaTime);
 }
 
 void Scene::render()
@@ -119,6 +138,7 @@ void Scene::render()
 	map->render();
 	player->render();
 	for (int i = 0; i < enemies.size(); ++i) enemies[i]->render();
+	for (int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->render();
 }
 
 void Scene::initShaders()
