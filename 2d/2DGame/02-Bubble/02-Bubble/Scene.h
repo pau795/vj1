@@ -24,6 +24,7 @@ public:
 	void init();
 	void update(int deltaTime);
 	void render();
+	bool playerColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2);
 
 private:
 	void initShaders();

@@ -122,7 +122,9 @@ void Scene::update(int deltaTime)
 	currentTime += deltaTime;
 	player->update(deltaTime);
 	for (int i = 0; i < enemies.size(); ++i) enemies[i]->update(deltaTime);
+
 	for (int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->update(deltaTime);
+	
 }
 
 void Scene::render()
@@ -171,5 +173,11 @@ void Scene::initShaders()
 	fShader.free();
 }
 
+bool Scene::playerColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2) {
+	
+	if (p2.x < t1.x || p1.x > t2.x) return false;
+	if (p2.y < t1.y || p1.y > t2.y) return false;
 
+	return true;
+}
 

@@ -1,2 +1,7 @@
-﻿  CheckPoint.cpp
+﻿  Scene.cpp
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\scene.cpp(124): warning C4018: '<': no coinciden signed/unsigned
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\scene.cpp(131): warning C4018: '<': no coinciden signed/unsigned
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\scene.cpp(147): warning C4018: '<': no coinciden signed/unsigned
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\scene.cpp(148): warning C4018: '<': no coinciden signed/unsigned
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\scene.cpp(105): warning C4715: 'Scene::loadLevel': no todas las rutas de acceso de control devuelven un valor
   02-Bubble.vcxproj -> C:\Users\pau_7\Documents\GitHub\vj1\2d\2DGame\02-Bubble\Debug\02-Bubble.exe
