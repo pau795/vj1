@@ -108,6 +108,7 @@ void Scene::init()
 {
 	initShaders();
 	levelId = 1;
+	deathTimer = -1;
 	string file = "levels/level";
 	file.append(to_string(levelId));
 	file.append(".txt");
@@ -121,9 +122,32 @@ void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
 	player->update(deltaTime);
-	for (int i = 0; i < enemies.size(); ++i) enemies[i]->update(deltaTime);
+	for (unsigned int i = 0; i < enemies.size(); ++i) {
+		enemies[i]->update(deltaTime);
+		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, enemies[i]->posCharacter, enemies[i]->posCharacter + enemies[i]->characterSize)) {
+			player->isDead = true;
+			player->changeDeadSprite();
+		}
+	}
+	for (unsigned int i = 0; i < checkPoints.size(); ++i) {
+		if (!checkPoints[i]->isActivated() && checkColision(player->posCharacter, player->posCharacter + player->characterSize, 
+			checkPoints[i]->posObject, checkPoints[i]->posObject + checkPoints[i]->objectSize)){
+				if (currentCheckPoint != NULL) currentCheckPoint->desactivateCheckPoint();
+				checkPoints[i]->activateCheckPoint(levelId, player->sprite->animation(), player->getGravity());
+				currentCheckPoint = checkPoints[i];
+		}
+		checkPoints[i]->update(deltaTime);
 
-	for (int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->update(deltaTime);
+	}
+	if (deathTimer > 0) --deathTimer;
+	if (deathTimer == -1 && player->isDead) deathTimer = 30;
+	if (deathTimer == 0) {
+		player->isDead = false;
+		player->setPosition(currentCheckPoint->posObject);
+		player->setGravity(currentCheckPoint->getGravity());
+		player->sprite->changeAnimation(currentCheckPoint->getPlayerAnimation());
+		deathTimer = -1;
+	}
 	
 }
 
@@ -138,9 +162,9 @@ void Scene::render()
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 	map->render();
+	for (unsigned int i = 0; i < enemies.size(); ++i) enemies[i]->render();
+	for (unsigned int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->render();
 	player->render();
-	for (int i = 0; i < enemies.size(); ++i) enemies[i]->render();
-	for (int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->render();
 }
 
 void Scene::initShaders()
@@ -173,7 +197,7 @@ void Scene::initShaders()
 	fShader.free();
 }
 
-bool Scene::playerColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2) {
+bool Scene::checkColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2) {
 	
 	if (p2.x < t1.x || p1.x > t2.x) return false;
 	if (p2.y < t1.y || p1.y > t2.y) return false;

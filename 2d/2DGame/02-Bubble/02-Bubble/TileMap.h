@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include "Texture.h"
 #include "ShaderProgram.h"
+#include <vector>
+using namespace std;
 
 
 // Class Tilemap is capable of loading a tile map from a text file in a very
@@ -28,10 +30,14 @@ public:
 	
 	int getTileSize() const { return tileSize; }
 
-	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
-	bool collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
+	//Results:
+	//-1 -> Collision with an spike
+	//0 -> No Collision
+	//1-> Collision with normal terrain
+	int collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
+	int collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
+	int collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
+	int collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 	
 private:
 	bool loadLevel(const string &levelFile);
@@ -46,6 +52,7 @@ private:
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
+	vector<int> spike_tiles;
 
 };
 

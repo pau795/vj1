@@ -3,15 +3,12 @@
 #include <sstream>
 #include <vector>
 #include "TileMap.h"
-
-
 using namespace std;
 
 
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
 {
 	TileMap *map = new TileMap(levelFile, minCoords, program);
-	
 	return map;
 }
 
@@ -20,6 +17,8 @@ TileMap::TileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProg
 {
 	loadLevel(levelFile);
 	prepareArrays(minCoords, program);
+	spike_tiles = { 9, 10, 50, 51 };
+
 }
 
 TileMap::~TileMap()
@@ -155,7 +154,7 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 // Method collisionMoveDown also corrects Y coordinate if the box is
 // already intersecting a tile below.
 
-bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
+int TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
 {
 	int x, y0, y1;
 	
@@ -163,15 +162,16 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y0 = pos.y / tileSize;
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
-	{
-		if(map[y*mapSize.x+x] != 0)
-			return true;
+	{	
+		int tile = map[y*mapSize.x + x];
+		if (find(spike_tiles.begin(), spike_tiles.end(), tile) != spike_tiles.end()) return -1;
+		else if (tile != 0) return 1;
 	}
 	
-	return false;
+	return 0;
 }
 
-bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const
+int TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const
 {
 	int x, y0, y1;
 	
@@ -180,14 +180,14 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
-			return true;
+		int tile = map[y*mapSize.x + x];
+		if (find(spike_tiles.begin(), spike_tiles.end(), tile)!=spike_tiles.end()) return -1;
+		else if (tile != 0) return 1;
 	}
-	
-	return false;
+	return 0;
 }
 
-bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
+int TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
 {
 	int x0, x1, y;
 	
@@ -196,20 +196,22 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	y = (pos.y + size.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		int tile = map[y*mapSize.x + x];
+		if (find(spike_tiles.begin(), spike_tiles.end(), tile) != spike_tiles.end()) return -1;
+		else if(tile != 0)
 		{
 			if(*posY - tileSize * y + size.y <= 4)
 			{
 				*posY = tileSize * y - size.y;
-				return true;
+				return 1;
 			}
 		}
 	}
 	
-	return false;
+	return 0;
 }
 
-bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
+int TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
 {
 	int x0, x1, y;
 
@@ -218,17 +220,19 @@ bool TileMap::collisionMoveUp(const glm::ivec2 &pos, const glm::ivec2 &size, int
 	y = (pos.y / tileSize);
 	for (int x = x0; x <= x1; x++)
 	{
-		if (map[y*mapSize.x + x] != 0)
+		int tile = map[y*mapSize.x + x];
+		if (find(spike_tiles.begin(), spike_tiles.end(), tile) != spike_tiles.end()) return -1;
+		if (tile != 0)
 		{
 			if (*posY - tileSize * y  >= -4)
 			{
 				*posY = tileSize * (y+1);
-				return true;
+				return 1;
 			}
 		}
 	}
 
-	return false;
+	return 0;
 }
 
 

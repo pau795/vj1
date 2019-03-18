@@ -18,11 +18,11 @@ bool Object::loadObject(int id, const string &file, ShaderProgram &shaderProgram
 		return false;
 	getline(fin, line);
 	sstream.str(line);
-	sstream >> ObjectSize.x >> ObjectSize.y >> numAnimations >> offsetX >> offsetY;
+	sstream >> objectSize.x >> objectSize.y >> numAnimations >> offsetX >> offsetY;
 	offsetX *= pixelSizeTexX;
 	offsetY *= pixelSizeTexY;
 	spritesheet.loadFromFile("images/sprites.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(ObjectSize.x, ObjectSize.y), glm::vec2(pixelSizeTexX*(ObjectSize.x), pixelSizeTexY*(ObjectSize.y)), &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(glm::ivec2(objectSize.x, objectSize.y), glm::vec2(pixelSizeTexX*(objectSize.x), pixelSizeTexY*(objectSize.y)), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(numAnimations);
 
 	for (int i = 0; i < numAnimations; ++i) {

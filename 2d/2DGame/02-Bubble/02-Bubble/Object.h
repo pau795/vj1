@@ -16,7 +16,7 @@ public:
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
 
-	glm::ivec2 tileMapDispl, posObject, ObjectSize;
+	glm::ivec2 tileMapDispl, posObject, objectSize;
 	int numAnimations;
 
 	Texture spritesheet;

@@ -7,12 +7,16 @@ class CheckPoint :
 public:
 	void init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
-	void activateCheckPoint(int animation, int gravity);
+	void activateCheckPoint(int level, int animation, int gravity);
 	void desactivateCheckPoint();
+	int getPlayerAnimation();
+	int getLevel();
+	int getGravity();
+	bool isActivated();
 
 private:
 	bool state;
-	int playerAnimation, gravity;
+	int level, playerAnimation, gravity;
 };
 
 #endif //_CHECK_POINT_INCLUDE

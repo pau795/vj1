@@ -24,7 +24,7 @@ public:
 	void init();
 	void update(int deltaTime);
 	void render();
-	bool playerColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2);
+	bool checkColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2);
 
 private:
 	void initShaders();
@@ -34,10 +34,13 @@ private:
 	Player *player;
 	vector<Enemy*> enemies;
 	vector<CheckPoint*> checkPoints;
+	CheckPoint *currentCheckPoint;
+	int levelId;
+	int deathTimer;
+
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
-	int levelId;
 
 };
 
