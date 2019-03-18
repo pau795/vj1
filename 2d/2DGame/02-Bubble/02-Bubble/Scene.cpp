@@ -14,8 +14,6 @@
 #define SCREEN_X 0
 #define SCREEN_Y 0
 
-#define INIT_PLAYER_X_TILES 4
-#define INIT_PLAYER_Y_TILES 22
 
 
 Scene::Scene()
@@ -51,7 +49,7 @@ bool Scene::loadLevel() {
 	sstream >> animation >> iniPosX >> iniPosY;
 	player = new Player();
 	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(iniPosX * map->getTileSize(), iniPosY * map->getTileSize()));
+	player->setPosition(glm::vec2(iniPosX * map->getTileSize(), iniPosY * map->getTileSize() - (player->characterSize.y % map->getTileSize())));
 	player->setTileMap(map);
 	(player)->sprite->changeAnimation(animation);
 
@@ -143,8 +141,14 @@ void Scene::update(int deltaTime)
 	if (deathTimer == -1 && player->isDead) deathTimer = 30;
 	if (deathTimer == 0) {
 		player->isDead = false;
-		player->setPosition(currentCheckPoint->posObject);
 		player->setGravity(currentCheckPoint->getGravity());
+		if (player->getGravity() > 0) {
+
+			glm::ivec2 a = currentCheckPoint->posObject;
+			a.y -= (player->characterSize.y)%map->getTileSize();
+			player->setPosition(a);
+		}
+		else player->setPosition(currentCheckPoint->posObject);
 		player->sprite->changeAnimation(currentCheckPoint->getPlayerAnimation());
 		deathTimer = -1;
 	}
