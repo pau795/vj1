@@ -102,6 +102,13 @@ bool TileMap::loadLevel(const string &levelFile)
 	return true;
 }
 
+int TileMap::getNumTilesX() {
+	return mapSize.x;
+}
+int TileMap::getNumTilesY() {
+	return mapSize.y;
+}
+
 void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 {
 	int tile, nTiles = 0;

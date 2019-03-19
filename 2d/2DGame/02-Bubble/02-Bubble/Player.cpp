@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define POS_INI_X 4
+#define POS_INI_Y 24
 #define KEY_SPACEBAR 32
 
 enum PlayerAnims
@@ -24,9 +26,11 @@ void Player::init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderPro
 	bJumping = false;
 	isDead = false;
 	fall_step = 4;
-	loadCharacter(id, "data/player.txt", shaderProgram);	
+	loadCharacter("data/player.txt", shaderProgram);	
 	tileMapDispl = tileMapPos;
+	setPosition(glm::vec2(POS_INI_X * map->getTileSize(), POS_INI_Y * map->getTileSize() - (characterSize.y % map->getTileSize())));
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posCharacter.x), float(tileMapDispl.y + posCharacter.y)));
+	sprite->changeAnimation(STAND_RIGHT);
 }
 
 void Player::changeJumpingSprite() {

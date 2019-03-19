@@ -4,7 +4,7 @@ void Enemy::init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProg
 	string file ="data/enemy";
 	file.append(to_string(id));
 	file.append(".txt");
-	loadCharacter(id, file, shaderProgram);
+	loadCharacter(file, shaderProgram);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posCharacter.x), float(tileMapDispl.y + posCharacter.y)));
 }

@@ -29,6 +29,8 @@ public:
 	void free();
 	
 	int getTileSize() const { return tileSize; }
+	int getNumTilesX();
+	int getNumTilesY();
 
 	//Results:
 	//-1 -> Collision with an spike

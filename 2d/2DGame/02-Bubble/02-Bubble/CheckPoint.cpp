@@ -11,7 +11,7 @@ void CheckPoint::init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shade
 	string file = "data/checkPoint";
 	file.append(to_string(id));
 	file.append(".txt");
-	loadObject(id, file, shaderProgram);
+	loadObject(file, shaderProgram);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posObject.x), float(tileMapDispl.y + posObject.y)));
 }

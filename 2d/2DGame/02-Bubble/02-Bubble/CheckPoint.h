@@ -13,6 +13,7 @@ public:
 	int getLevel();
 	int getGravity();
 	bool isActivated();
+	int id;
 
 private:
 	bool state;

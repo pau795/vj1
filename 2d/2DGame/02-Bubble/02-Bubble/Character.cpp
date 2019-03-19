@@ -26,7 +26,7 @@ void Character::setPosition(const glm::vec2 &pos)
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posCharacter.x), float(tileMapDispl.y + posCharacter.y)));
 }
 
-bool Character::loadCharacter(int id, const string &file, ShaderProgram &shaderProgram) {
+bool Character::loadCharacter(const string &file, ShaderProgram &shaderProgram) {
 
 
 	ifstream fin;

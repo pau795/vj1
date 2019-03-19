@@ -14,7 +14,9 @@
 #define SCREEN_X 0
 #define SCREEN_Y 0
 
-
+enum LevelDirections {
+	LEFT, RIGHT, TOP, BOTTOM
+};
 
 Scene::Scene()
 {
@@ -41,20 +43,13 @@ bool Scene::loadLevel() {
 	fin.open(file.c_str());
 	if (!fin.is_open())
 		return false;
+	//Load level links
 	getline(fin, line);
 	sstream.str(line);
-
-	//Load Player
-	int animation, iniPosX, iniPosY;
-	sstream >> animation >> iniPosX >> iniPosY;
-	player = new Player();
-	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(iniPosX * map->getTileSize(), iniPosY * map->getTileSize() - (player->characterSize.y % map->getTileSize())));
-	player->setTileMap(map);
-	(player)->sprite->changeAnimation(animation);
-
+	int left, right, top, bottom;
+	sstream >> left >> right >> top >> bottom;
+	levelLinks = { left, right, top, bottom };
 	//Load Enemies
-
 	getline(fin, line);
 	sstream.str(line);
 	int numEnemies;
@@ -93,13 +88,26 @@ bool Scene::loadLevel() {
 	for (int i = 0; i < numCheckPoints; ++i) {
 		getline(fin, line);
 		sstream.str(line);
-		int id, x, y;
-		sstream >> id >> x >> y;
+		int orientation, x, y;
+		sstream >> orientation >> x >> y;
 		CheckPoint* c = new CheckPoint();
-		c->init(id, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-		c->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		if (currentCheckPoint != NULL && currentCheckPoint->getLevel() == levelId && currentCheckPoint->id == i)
+			c = currentCheckPoint;
+		else{
+			c->init(orientation, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			c->id = i;
+			c->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		}
 		checkPoints[i] = c;
 	}
+}
+
+void Scene::changeLevel() {
+	string file = "levels/level";
+	file.append(to_string(levelId));
+	file.append(".txt");
+	map = TileMap::createTileMap(file, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	loadLevel();
 }
 
 void Scene::init()
@@ -107,11 +115,10 @@ void Scene::init()
 	initShaders();
 	levelId = 1;
 	deathTimer = -1;
-	string file = "levels/level";
-	file.append(to_string(levelId));
-	file.append(".txt");
-	map = TileMap::createTileMap(file, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-	loadLevel();
+	changeLevel();
+	player = new Player();
+	player->setTileMap(map);
+	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	projection = glm::ortho(0.f, float(320- 1), float(240 - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -120,6 +127,7 @@ void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
 	player->update(deltaTime);
+	//UPDATE ENEMIES
 	for (unsigned int i = 0; i < enemies.size(); ++i) {
 		enemies[i]->update(deltaTime);
 		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, enemies[i]->posCharacter, enemies[i]->posCharacter + enemies[i]->characterSize)) {
@@ -127,6 +135,7 @@ void Scene::update(int deltaTime)
 			player->changeDeadSprite();
 		}
 	}
+	//UPDATE CHECKPOINTS
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) {
 		if (!checkPoints[i]->isActivated() && checkColision(player->posCharacter, player->posCharacter + player->characterSize, 
 			checkPoints[i]->posObject, checkPoints[i]->posObject + checkPoints[i]->objectSize)){
@@ -137,20 +146,51 @@ void Scene::update(int deltaTime)
 		checkPoints[i]->update(deltaTime);
 
 	}
+	//CHECK RESPAWN CONDITIONS
 	if (deathTimer > 0) --deathTimer;
 	if (deathTimer == -1 && player->isDead) deathTimer = 30;
 	if (deathTimer == 0) {
 		player->isDead = false;
 		player->setGravity(currentCheckPoint->getGravity());
 		if (player->getGravity() > 0) {
-
 			glm::ivec2 a = currentCheckPoint->posObject;
 			a.y -= (player->characterSize.y)%map->getTileSize();
 			player->setPosition(a);
 		}
 		else player->setPosition(currentCheckPoint->posObject);
 		player->sprite->changeAnimation(currentCheckPoint->getPlayerAnimation());
+		if (currentCheckPoint->getLevel() != levelId) {
+			levelId = currentCheckPoint->getLevel();
+			changeLevel();
+			player->setTileMap(map);
+		}
 		deathTimer = -1;
+	}
+	//CHECK LEVEL CHANGE
+	if (player->posCharacter.x < 0) { //COLLISION WITH LEFT EDGE
+		levelId = levelLinks[LEFT];
+		changeLevel();
+		player->setTileMap(map);
+		player->posCharacter.x = map->getNumTilesX()*map->getTileSize() - player->characterSize.x;
+	}
+	else if (player->posCharacter.x + player->characterSize.x > map->getNumTilesX()*map->getTileSize()) { //COLLISION WITH RIGHT EDGE
+		levelId = levelLinks[RIGHT];
+		changeLevel();
+		player->setTileMap(map);
+		player->posCharacter.x = 0;
+	}
+
+	else if (player->posCharacter.y < 0) { //COLISION WITH TOP EDGE	
+		levelId = levelLinks[TOP];
+		changeLevel();
+		player->setTileMap(map);
+		player->posCharacter.y = map->getNumTilesY()*map->getTileSize() - player->characterSize.y;
+	}
+	else if (player->posCharacter.y + player->characterSize.y >= map->getNumTilesY()*map->getTileSize()) { //COLLISION WITH BOTTOM EDGE
+		levelId = levelLinks[BOTTOM];
+		changeLevel();
+		player->setTileMap(map);
+		player->posCharacter.y = 0;
 	}
 	
 }

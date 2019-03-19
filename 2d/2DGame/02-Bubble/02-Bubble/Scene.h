@@ -25,6 +25,7 @@ public:
 	void update(int deltaTime);
 	void render();
 	bool checkColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2);
+	void changeLevel();
 
 private:
 	void initShaders();
@@ -37,7 +38,7 @@ private:
 	CheckPoint *currentCheckPoint;
 	int levelId;
 	int deathTimer;
-
+	vector<int> levelLinks;
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;

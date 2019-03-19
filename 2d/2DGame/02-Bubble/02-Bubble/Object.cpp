@@ -4,7 +4,7 @@
 #include <sstream>
 
 
-bool Object::loadObject(int id, const string &file, ShaderProgram &shaderProgram) {
+bool Object::loadObject(const string &file, ShaderProgram &shaderProgram) {
 
 
 	ifstream fin;

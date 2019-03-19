@@ -14,7 +14,7 @@ class Character
 {
 
 public:
-	bool loadCharacter(int id, const string &file, ShaderProgram &shaderProgram);
+	bool loadCharacter(const string &file, ShaderProgram &shaderProgram);
 	virtual void init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)=0;
 	virtual void update(int deltaTime)=0;
 	void render();
