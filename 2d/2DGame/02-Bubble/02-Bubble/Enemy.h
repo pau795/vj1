@@ -18,6 +18,9 @@ public:
 
 	int speed;
 	int patrol1, patrol2;
+	enum {
+		A, B
+	};
 
 private:
 };

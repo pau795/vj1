@@ -173,7 +173,7 @@ void Scene::update(int deltaTime)
 		player->setTileMap(map);
 		player->posCharacter.x = map->getNumTilesX()*map->getTileSize() - player->characterSize.x;
 	}
-	else if (player->posCharacter.x + player->characterSize.x > map->getNumTilesX()*map->getTileSize()) { //COLLISION WITH RIGHT EDGE
+	else if (player->posCharacter.x + player->characterSize.x >= map->getNumTilesX()*map->getTileSize()) { //COLLISION WITH RIGHT EDGE
 		levelId = levelLinks[RIGHT];
 		changeLevel();
 		player->setTileMap(map);
