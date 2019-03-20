@@ -19,6 +19,9 @@
     <ClInclude Include="EnemyVer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Platform.h" />
+    <ClInclude Include="PlatformHor.h" />
+    <ClInclude Include="PlatformVer.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
@@ -36,6 +39,9 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Platform.cpp" />
+    <ClCompile Include="PlatformHor.cpp" />
+    <ClCompile Include="PlatformVer.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -48,7 +54,7 @@
     <ProjectGuid>{5BE6CA2A-E5A8-40CC-9015-047CE0C78036}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>My01window</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

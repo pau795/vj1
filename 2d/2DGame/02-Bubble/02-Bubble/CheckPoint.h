@@ -5,6 +5,7 @@ class CheckPoint :
 	public Object
 {
 public:
+	bool loadObject(const string &file, ShaderProgram &shaderProgram);
 	void init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void activateCheckPoint(int level, int animation, int gravity);

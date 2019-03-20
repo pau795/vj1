@@ -8,7 +8,7 @@
 class Object
 {
 public:
-	bool loadObject(const string &file, ShaderProgram &shaderProgram);
+	virtual bool loadObject(const string &file, ShaderProgram &shaderProgram) = 0;
 	virtual void init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) = 0;
 	virtual void update(int deltaTime) = 0;
 	void render();
