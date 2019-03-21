@@ -2,6 +2,9 @@
 
 
 void PlatformHor::update(int deltaTime) {
-	sprite->update(deltaTime);
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posObject.x), float(tileMapDispl.y + posObject.y)));
+	for (int i = 0; i < chunks.size(); ++i) {
+		chunks[i]->sprite->update(deltaTime);
+		chunks[i]->sprite->setPosition(glm::vec2(float(chunks[i]->tileMapDispl.x + chunks[i]->posObject.x), float(chunks[i]->tileMapDispl.y + chunks[i]->posObject.y)));
+	}
+	
 }

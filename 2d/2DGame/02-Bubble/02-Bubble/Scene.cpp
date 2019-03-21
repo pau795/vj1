@@ -9,6 +9,8 @@
 #include "Enemy.h"
 #include "EnemyVer.h"
 #include "EnemyHor.h"
+#include "PlatformHor.h"
+#include "PlatformVer.h"
 
 
 #define SCREEN_X 0
@@ -100,6 +102,24 @@ bool Scene::loadLevel() {
 		}
 		checkPoints[i] = c;
 	}
+
+	//LOAD PLATFORM
+	getline(fin, line);
+	sstream.str(line);
+	int numPlatforms;
+	sstream >> numPlatforms;
+	platforms.clear();
+	platforms.resize(numPlatforms);
+	for (int i = 0; i < numPlatforms; ++i) {
+		getline(fin, line);
+		sstream.str(line);
+		int id,size, x, y;
+		sstream >> id >> size >> x >> y;
+		Platform* p = new PlatformHor();
+		p->init(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		p->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		platforms[i] = p;
+	}
 }
 
 void Scene::changeLevel() {
@@ -135,6 +155,8 @@ void Scene::update(int deltaTime)
 			player->changeDeadSprite();
 		}
 	}
+	for (unsigned int i = 0; i < platforms.size(); ++i)
+		platforms[i]->update(deltaTime);
 	//UPDATE CHECKPOINTS
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) {
 		if (!checkPoints[i]->isActivated() && checkColision(player->posCharacter, player->posCharacter + player->characterSize, 
@@ -208,6 +230,7 @@ void Scene::render()
 	map->render();
 	for (unsigned int i = 0; i < enemies.size(); ++i) enemies[i]->render();
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->render();
+	for (unsigned int i = 0; i < platforms.size(); ++i) platforms[i]->render();
 	player->render();
 }
 

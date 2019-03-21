@@ -1,16 +1,19 @@
 #pragma once
-#include "Object.h"
-class Platform :
-	public Object
+#include "Chunk.h"
+
+class Platform
 {
 public:
-	bool loadObject(const string &file, ShaderProgram &shaderProgram);
-	void init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
+	void init(int id, int size, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
+	void render();
 	virtual void update(int deltaTime)=0;
-	int speed;
-	int posA, posB;
+	void setPosition(const glm::vec2 &pos);
+
+	glm::ivec2 posObject, objectSize;
+	vector<Chunk*> chunks;
 
 private:
+
 
 };
 

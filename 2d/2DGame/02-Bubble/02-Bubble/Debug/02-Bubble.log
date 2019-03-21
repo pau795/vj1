@@ -1,31 +1,6 @@
-﻿  Character.cpp
-c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\character.cpp(36): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
-  CheckPoint.cpp
-c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\checkpoint.cpp(19): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
-  Enemy.cpp
-  EnemyHor.cpp
-  EnemyVer.cpp
-  Game.cpp
-  main.cpp
-  Object.cpp
-  Platform.cpp
-c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\platform.cpp(13): warning C4305: 'inicializando': truncamiento de 'double' a 'float'
-  PlatformHor.cpp
-  PlatformVer.cpp
-  Player.cpp
-  Scene.cpp
-  Shader.cpp
-  ShaderProgram.cpp
-  Sprite.cpp
-  Texture.cpp
-  TileMap.cpp
-  Generando código...
-c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\scene.cpp(103): warning C4715: 'Scene::loadLevel': no todas las rutas de acceso de control devuelven un valor
-c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\platform.cpp(47): warning C4715: 'Platform::loadObject': no todas las rutas de acceso de control devuelven un valor
-c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\checkpoint.cpp(53): warning C4715: 'CheckPoint::loadObject': no todas las rutas de acceso de control devuelven un valor
-c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\character.cpp(69): warning C4715: 'Character::loadCharacter': no todas las rutas de acceso de control devuelven un valor
-SOIL.lib(image_DXT.obj) : warning LNK4099: no se encontró PDB 'vc100.pdb' con 'SOIL.lib(image_DXT.obj)' o en 'C:\Users\pau_7\Documents\GitHub\vj1\2d\2DGame\02-Bubble\Debug\vc100.pdb'; se vinculará el objeto sin tener en cuenta información de depuración
-SOIL.lib(image_helper.obj) : warning LNK4099: no se encontró PDB 'vc100.pdb' con 'SOIL.lib(image_helper.obj)' o en 'C:\Users\pau_7\Documents\GitHub\vj1\2d\2DGame\02-Bubble\Debug\vc100.pdb'; se vinculará el objeto sin tener en cuenta información de depuración
-SOIL.lib(SOIL.obj) : warning LNK4099: no se encontró PDB 'vc100.pdb' con 'SOIL.lib(SOIL.obj)' o en 'C:\Users\pau_7\Documents\GitHub\vj1\2d\2DGame\02-Bubble\Debug\vc100.pdb'; se vinculará el objeto sin tener en cuenta información de depuración
-SOIL.lib(stb_image_aug.obj) : warning LNK4099: no se encontró PDB 'vc100.pdb' con 'SOIL.lib(stb_image_aug.obj)' o en 'C:\Users\pau_7\Documents\GitHub\vj1\2d\2DGame\02-Bubble\Debug\vc100.pdb'; se vinculará el objeto sin tener en cuenta información de depuración
+﻿  Chunk.cpp
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\chunk.cpp(21): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\chunk.cpp(22): warning C4244: '=': conversión de 'double' a 'float'; posible pérdida de datos
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\chunk.cpp(41): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+c:\users\pau_7\documents\github\vj1\2d\2dgame\02-bubble\02-bubble\chunk.cpp(47): warning C4715: 'Chunk::loadObject': no todas las rutas de acceso de control devuelven un valor
   02-Bubble.vcxproj -> C:\Users\pau_7\Documents\GitHub\vj1\2d\2DGame\02-Bubble\Debug\02-Bubble.exe

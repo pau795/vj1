@@ -5,6 +5,9 @@ class PlatformVer :
 {
 public:
 	void update(int deltaTime) override;
+
+	int speed;
+	int posA, posB;
 private:
 
 };
