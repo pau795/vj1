@@ -11,6 +11,7 @@
 #include "EnemyHor.h"
 #include "PlatformHor.h"
 #include "PlatformVer.h"
+#include "ConveyorBelt.h"
 
 
 #define SCREEN_X 0
@@ -28,9 +29,9 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	if(map != NULL)
+	if (map != NULL)
 		delete map;
-	if(player != NULL)
+	if (player != NULL)
 		delete player;
 }
 
@@ -113,12 +114,30 @@ bool Scene::loadLevel() {
 	for (int i = 0; i < numPlatforms; ++i) {
 		getline(fin, line);
 		sstream.str(line);
-		int id,size, x, y;
+		int id, size, x, y;
 		sstream >> id >> size >> x >> y;
 		Platform* p = new PlatformHor();
 		p->init(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		p->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
 		platforms[i] = p;
+	}
+
+	//LOAD CONVEYOR BELTS
+	getline(fin, line);
+	sstream.str(line);
+	int numConveyorBelts;
+	sstream >> numConveyorBelts;
+	conveyorBelts.clear();
+	conveyorBelts.resize(numConveyorBelts);
+	for (int i = 0; i < numConveyorBelts; ++i) {
+		getline(fin, line);
+		sstream.str(line);
+		int id, size, x, y;
+		sstream >> id >> size >> x >> y;
+		ConveyorBelt* c = new ConveyorBelt();
+		c->init(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		c->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		conveyorBelts[i] = c;
 	}
 }
 
@@ -139,7 +158,7 @@ void Scene::init()
 	player = new Player();
 	player->setTileMap(map);
 	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	projection = glm::ortho(0.f, float(320- 1), float(240 - 1), 0.f);
+	projection = glm::ortho(0.f, float(320 - 1), float(240 - 1), 0.f);
 	currentTime = 0.0f;
 }
 
@@ -155,15 +174,13 @@ void Scene::update(int deltaTime)
 			player->changeDeadSprite();
 		}
 	}
-	for (unsigned int i = 0; i < platforms.size(); ++i)
-		platforms[i]->update(deltaTime);
 	//UPDATE CHECKPOINTS
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) {
-		if (!checkPoints[i]->isActivated() && checkColision(player->posCharacter, player->posCharacter + player->characterSize, 
+		if (!checkPoints[i]->isActivated() && checkColision(player->posCharacter, player->posCharacter + player->characterSize,
 			checkPoints[i]->posObject, checkPoints[i]->posObject + checkPoints[i]->objectSize)){
-				if (currentCheckPoint != NULL) currentCheckPoint->desactivateCheckPoint();
-				checkPoints[i]->activateCheckPoint(levelId, player->sprite->animation(), player->getGravity());
-				currentCheckPoint = checkPoints[i];
+			if (currentCheckPoint != NULL) currentCheckPoint->desactivateCheckPoint();
+			checkPoints[i]->activateCheckPoint(levelId, player->sprite->animation(), player->getGravity());
+			currentCheckPoint = checkPoints[i];
 		}
 		checkPoints[i]->update(deltaTime);
 
@@ -176,7 +193,7 @@ void Scene::update(int deltaTime)
 		player->setGravity(currentCheckPoint->getGravity());
 		if (player->getGravity() > 0) {
 			glm::ivec2 a = currentCheckPoint->posObject;
-			a.y -= (player->characterSize.y)%map->getTileSize();
+			a.y -= (player->characterSize.y) % map->getTileSize();
 			player->setPosition(a);
 		}
 		else player->setPosition(currentCheckPoint->posObject);
@@ -214,7 +231,13 @@ void Scene::update(int deltaTime)
 		player->setTileMap(map);
 		player->posCharacter.y = 0;
 	}
-	
+	//CHECK CONVEYER BELT
+	for (unsigned int i = 0; i < conveyorBelts.size(); ++i){
+		conveyorBelts[i]->update(deltaTime);
+		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, conveyorBelts[i]->posObject, conveyorBelts[i]->posObject + conveyorBelts[i]->objectSize)) {
+			player->posCharacter.x += deltaTime / 10;
+		}
+	}
 }
 
 void Scene::render()
@@ -231,6 +254,7 @@ void Scene::render()
 	for (unsigned int i = 0; i < enemies.size(); ++i) enemies[i]->render();
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->render();
 	for (unsigned int i = 0; i < platforms.size(); ++i) platforms[i]->render();
+	for (unsigned int i = 0; i < conveyorBelts.size(); ++i) conveyorBelts[i]->render();
 	player->render();
 }
 
@@ -239,13 +263,13 @@ void Scene::initShaders()
 	Shader vShader, fShader;
 
 	vShader.initFromFile(VERTEX_SHADER, "shaders/texture.vert");
-	if(!vShader.isCompiled())
+	if (!vShader.isCompiled())
 	{
 		cout << "Vertex Shader Error" << endl;
 		cout << "" << vShader.log() << endl << endl;
 	}
 	fShader.initFromFile(FRAGMENT_SHADER, "shaders/texture.frag");
-	if(!fShader.isCompiled())
+	if (!fShader.isCompiled())
 	{
 		cout << "Fragment Shader Error" << endl;
 		cout << "" << fShader.log() << endl << endl;
@@ -254,7 +278,7 @@ void Scene::initShaders()
 	texProgram.addShader(vShader);
 	texProgram.addShader(fShader);
 	texProgram.link();
-	if(!texProgram.isLinked())
+	if (!texProgram.isLinked())
 	{
 		cout << "Shader Linking Error" << endl;
 		cout << "" << texProgram.log() << endl << endl;
@@ -265,7 +289,7 @@ void Scene::initShaders()
 }
 
 bool Scene::checkColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2) {
-	
+
 	if (p2.x < t1.x || p1.x > t2.x) return false;
 	if (p2.y < t1.y || p1.y > t2.y) return false;
 
