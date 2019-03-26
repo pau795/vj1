@@ -9,13 +9,16 @@
 #include "Enemy.h"
 #include "EnemyVer.h"
 #include "EnemyHor.h"
-#include "PlatformHor.h"
-#include "PlatformVer.h"
+#include "MovingPlatformHor.h"
+#include "MovingPlatformVer.h"
+#include "MovingPlatform.h"
 #include "ConveyorBelt.h"
+#include <GL/glut.h>
 
 
 #define SCREEN_X 0
 #define SCREEN_Y 0
+#define KEY_SPACEBAR 32
 
 enum LevelDirections {
 	LEFT, RIGHT, TOP, BOTTOM
@@ -67,14 +70,13 @@ bool Scene::loadLevel() {
 		Enemy *e;
 		if (type == 0) {
 			e = new EnemyHor();
-			e->setTileMap(map);
-			e->setPatrolPoints(p1x, p2x);
+			e->setPatrolPoints(p1x*map->getTileSize(), p2x*map->getTileSize());
 		}
 		else {
 			e = new EnemyVer();
-			e->setTileMap(map);
-			e->setPatrolPoints(p1y, p2y);
+			e->setPatrolPoints(p1y*map->getTileSize(), p2y*map->getTileSize());
 		}
+		e->setTileMap(map);
 		e->init(id, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		e->setPosition(glm::vec2(p1x * map->getTileSize(), p1y * map->getTileSize()));
 		e->setSpeed(speed);
@@ -114,11 +116,21 @@ bool Scene::loadLevel() {
 	for (int i = 0; i < numPlatforms; ++i) {
 		getline(fin, line);
 		sstream.str(line);
-		int id, size, x, y;
-		sstream >> id >> size >> x >> y;
-		Platform* p = new PlatformHor();
+		int id, type, size, speed,  p1x, p1y, p2x, p2y;
+		sstream >> id >> type >> size >>speed >> p1x >> p1y >> p2x >> p2y;
+		MovingPlatform* p;
+		if (type == 0) {
+			p = new MovingPlatformHor();
+			p->setPatrolPoints(p1x*map->getTileSize(), p2x*map->getTileSize());
+		}
+		else {
+			p = new MovingPlatformVer();
+			p->setPatrolPoints(p1y*map->getTileSize(), p2y*map->getTileSize());
+		}
 		p->init(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-		p->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		p->speed = speed;
+		p->player = player;
+		p->setPosition(glm::vec2(p1x * map->getTileSize(), p1y * map->getTileSize()));
 		platforms[i] = p;
 	}
 
@@ -134,8 +146,8 @@ bool Scene::loadLevel() {
 		sstream.str(line);
 		int id, size, x, y;
 		bool auxIsRight;
-		sstream >> id >> size >> x >> y >> auxIsRight;
-		Platform* c = new ConveyorBelt();
+		sstream >> id >> auxIsRight >> size >> x >> y;
+		ConveyorBelt* c = new ConveyorBelt();
 		c->init(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		c->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
 		c->isRight = auxIsRight;
@@ -160,6 +172,7 @@ void Scene::init()
 	player = new Player();
 	player->setTileMap(map);
 	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	for(unsigned int i =0; i< platforms.size(); ++i) platforms[i]->player = player;
 	projection = glm::ortho(0.f, float(320 - 1), float(240 - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -167,7 +180,6 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
-	player->update(deltaTime);
 	//UPDATE ENEMIES
 	for (unsigned int i = 0; i < enemies.size(); ++i) {
 		enemies[i]->update(deltaTime);
@@ -185,7 +197,49 @@ void Scene::update(int deltaTime)
 			currentCheckPoint = checkPoints[i];
 		}
 		checkPoints[i]->update(deltaTime);
-
+	}
+	//UPDATE MOVING PLATFORMS
+	bool colision = false;
+	for (unsigned int i = 0; i < platforms.size(); ++i) {
+		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, platforms[i]->posObject, platforms[i]->posObject + platforms[i]->objectSize)) {
+			player->setJumping(false);
+			player->changeLandingSprite();
+			int gravity = player->getGravity();
+			if (gravity > 0 && !player->isDead) player->posCharacter.y = platforms[i]->posObject.y-player->characterSize.y-gravity;
+			else  if (!player->isDead) player->posCharacter.y = platforms[i]->posObject.y+ platforms[i]->objectSize.y-gravity;
+			player->setLinkedPlatform(i);
+			colision = true;
+			platforms[i]->playerLinked = true;
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) player->flipGravity();
+		}
+		if (!colision && player->getLinkedPlatform() >= 0) {
+			platforms[player->getLinkedPlatform()]->playerLinked = false;
+			player->setLinkedPlatform(-1);
+		}
+		platforms[i]->update(deltaTime);
+	}
+	//UPDATE CONVEYER BELT
+	for (unsigned int i = 0; i < conveyorBelts.size(); ++i) {
+		conveyorBelts[i]->update(deltaTime);
+		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, conveyorBelts[i]->posObject, conveyorBelts[i]->posObject + conveyorBelts[i]->objectSize)) {
+			int drag;
+			if (conveyorBelts[i]->isRight) drag= deltaTime / 10;
+			else drag = -deltaTime / 10;
+			player->posCharacter.x += drag;
+			if (map->collisionMoveLeft(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == 1)
+				player->posCharacter.x -= drag;
+			else if (map->collisionMoveLeft(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
+				player->isDead = true;
+				player->changeDeadSprite();
+			}
+			else if (map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == 1)
+				player->posCharacter.x -= drag;
+			else if (map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
+				player->isDead = true;
+				player->changeDeadSprite();
+			}
+			else if (player->isDead) player->posCharacter.x -= drag;
+		}
 	}
 	//CHECK RESPAWN CONDITIONS
 	if (deathTimer > 0) --deathTimer;
@@ -233,22 +287,7 @@ void Scene::update(int deltaTime)
 		player->setTileMap(map);
 		player->posCharacter.y = 0;
 	}
-	//CHECK CONVEYER BELT
-	for (unsigned int i = 0; i < conveyorBelts.size(); ++i){
-		conveyorBelts[i]->update(deltaTime);
-		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, conveyorBelts[i]->posObject, conveyorBelts[i]->posObject + conveyorBelts[i]->objectSize)) {
-			if (map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
-				player->isDead = true;
-				player->changeDeadSprite();
-			}
-			else if (map->collisionMoveLeft(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
-				player->isDead = true;
-				player->changeDeadSprite();
-			}
-			else if (conveyorBelts[i]->isRight) player->posCharacter.x += deltaTime / 10;
-			else if (!conveyorBelts[i]->isRight) player->posCharacter.x -= deltaTime / 10;
-		}
-	}
+	player->update(deltaTime);
 }
 
 void Scene::render()

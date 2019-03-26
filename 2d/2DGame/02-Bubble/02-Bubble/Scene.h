@@ -7,7 +7,8 @@
 #include "TileMap.h"
 #include "Player.h"
 #include "Enemy.h"
-#include "Platform.h"
+#include "MovingPlatform.h"
+#include "ConveyorBelt.h"
 #include "CheckPoint.h"
 
 
@@ -36,8 +37,8 @@ private:
 	Player *player;
 	vector<Enemy*> enemies;
 	vector<CheckPoint*> checkPoints;
-	vector<Platform*> platforms;
-	vector<Platform*> conveyorBelts;
+	vector<MovingPlatform*> platforms;
+	vector<ConveyorBelt*> conveyorBelts;
 	CheckPoint *currentCheckPoint;
 	int levelId;
 	int deathTimer;

@@ -1,3 +1,9 @@
 -1 2 -1 -1 
 0 
 0 
+2 
+1 1 6 2 7 10 7 20 
+1 0 6 2 15 10 25 10 		//platform i definition -> id, type, size, speed, tileX, tileY, patrolX, PatrolY 
+2 
+3 0 30 4 4 
+2 1 32 4 25 

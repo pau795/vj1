@@ -24,9 +24,14 @@ public:
 	void changeJumpingSprite();
 	void changeLandingSprite();
 	void changeDeadSprite();
+	bool isJumping();
+	void setJumping(bool jump);
+	int getLinkedPlatform();
+	void setLinkedPlatform(int pltaform);
 	
 private:
 	bool bJumping;
+	int linkedPlatform;
 	int fall_step;
 
 	

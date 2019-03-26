@@ -24,6 +24,7 @@ enum PlayerAnims
 void Player::init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
 	bJumping = false;
+	linkedPlatform = -1;
 	isDead = false;
 	fall_step = 4;
 	loadCharacter("data/player.txt", shaderProgram);	
@@ -67,6 +68,9 @@ void Player::changeDeadSprite() {
 		sprite->changeAnimation(FLIPPED_DEAD_RIGHT);
 }
 
+void Player::setJumping(bool jump) {
+	bJumping = jump;
+}
 
 void Player::flipGravity() {
 	bJumping = true;
@@ -80,6 +84,17 @@ int Player::getGravity() {
 
 void Player::setGravity(int gravity) {
 	fall_step = gravity;
+}
+
+int Player::getLinkedPlatform() {
+	return linkedPlatform;
+}
+void Player::setLinkedPlatform(int platform) {
+	linkedPlatform = platform;
+}
+
+bool Player::isJumping() {
+	return bJumping;
 }
 
 void Player::update(int deltaTime)

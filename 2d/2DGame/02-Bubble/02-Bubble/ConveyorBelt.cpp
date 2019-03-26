@@ -1,4 +1,5 @@
 #include "ConveyorBelt.h"
+#include "Chunk.h"
 
 
 void ConveyorBelt::update(int deltaTime) {
@@ -6,5 +7,4 @@ void ConveyorBelt::update(int deltaTime) {
 		chunks[i]->sprite->update(deltaTime);
 		chunks[i]->sprite->setPosition(glm::vec2(float(chunks[i]->tileMapDispl.x + chunks[i]->posObject.x), float(chunks[i]->tileMapDispl.y + chunks[i]->posObject.y)));
 	}
-
 }
