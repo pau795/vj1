@@ -133,10 +133,12 @@ bool Scene::loadLevel() {
 		getline(fin, line);
 		sstream.str(line);
 		int id, size, x, y;
-		sstream >> id >> size >> x >> y;
+		bool auxIsRight;
+		sstream >> id >> size >> x >> y >> auxIsRight;
 		Platform* c = new ConveyorBelt();
 		c->init(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		c->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		c->isRight = auxIsRight;
 		conveyorBelts[i] = c;
 	}
 }
@@ -243,7 +245,8 @@ void Scene::update(int deltaTime)
 				player->isDead = true;
 				player->changeDeadSprite();
 			}
-			else player->posCharacter.x += deltaTime / 10;
+			else if (conveyorBelts[i]->isRight) player->posCharacter.x += deltaTime / 10;
+			else if (!conveyorBelts[i]->isRight) player->posCharacter.x -= deltaTime / 10;
 		}
 	}
 }

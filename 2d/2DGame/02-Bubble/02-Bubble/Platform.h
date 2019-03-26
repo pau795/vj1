@@ -11,7 +11,7 @@ public:
 
 	glm::ivec2 posObject, objectSize;
 	vector<Chunk*> chunks;
-
+	bool isRight;
 private:
 
 
