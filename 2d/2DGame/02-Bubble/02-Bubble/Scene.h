@@ -8,7 +8,6 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Platform.h"
-#include "ConveyorBelt.h"
 #include "CheckPoint.h"
 
 
@@ -38,7 +37,7 @@ private:
 	vector<Enemy*> enemies;
 	vector<CheckPoint*> checkPoints;
 	vector<Platform*> platforms;
-	vector<ConveyorBelt*> conveyorBelts;
+	vector<Platform*> conveyorBelts;
 	CheckPoint *currentCheckPoint;
 	int levelId;
 	int deathTimer;

@@ -134,7 +134,7 @@ bool Scene::loadLevel() {
 		sstream.str(line);
 		int id, size, x, y;
 		sstream >> id >> size >> x >> y;
-		ConveyorBelt* c = new ConveyorBelt();
+		Platform* c = new ConveyorBelt();
 		c->init(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 		c->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
 		conveyorBelts[i] = c;
@@ -236,6 +236,10 @@ void Scene::update(int deltaTime)
 		conveyorBelts[i]->update(deltaTime);
 		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, conveyorBelts[i]->posObject, conveyorBelts[i]->posObject + conveyorBelts[i]->objectSize)) {
 			if (map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
+				player->isDead = true;
+				player->changeDeadSprite();
+			}
+			else if (map->collisionMoveLeft(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
 				player->isDead = true;
 				player->changeDeadSprite();
 			}
