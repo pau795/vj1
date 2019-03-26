@@ -235,7 +235,11 @@ void Scene::update(int deltaTime)
 	for (unsigned int i = 0; i < conveyorBelts.size(); ++i){
 		conveyorBelts[i]->update(deltaTime);
 		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, conveyorBelts[i]->posObject, conveyorBelts[i]->posObject + conveyorBelts[i]->objectSize)) {
-			player->posCharacter.x += deltaTime / 10;
+			if (map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
+				player->isDead = true;
+				player->changeDeadSprite();
+			}
+			else player->posCharacter.x += deltaTime / 10;
 		}
 	}
 }
