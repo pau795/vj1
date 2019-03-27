@@ -45,6 +45,11 @@ void Player::changeJumpingSprite() {
 	else if (sprite->animation() == MOVE_RIGHT || sprite->animation() == STAND_RIGHT)
 		sprite->changeAnimation(FLIPPED_JUMP_RIGHT);
 }
+int Player::getBase() {
+	if (fall_step > 0) 	return posCharacter.y + characterSize.y;
+	else return posCharacter.y;
+}
+
 
 void Player::changeLandingSprite() {
 	if (sprite->animation() == JUMP_LEFT)

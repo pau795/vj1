@@ -201,7 +201,7 @@ void Scene::update(int deltaTime)
 	//UPDATE MOVING PLATFORMS
 	bool colision = false;
 	for (unsigned int i = 0; i < platforms.size(); ++i) {
-		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, platforms[i]->posObject, platforms[i]->posObject + platforms[i]->objectSize)) {
+		if (checkColisionPlatform(player->posCharacter.x, player->posCharacter.x + player->characterSize.x, player->getBase() + player->getGravity(), platforms[i]->posObject, platforms[i]->posObject + platforms[i]->objectSize)) {
 			player->setJumping(false);
 			player->changeLandingSprite();
 			int gravity = player->getGravity();
@@ -265,12 +265,14 @@ void Scene::update(int deltaTime)
 	if (player->posCharacter.x < 0) { //COLLISION WITH LEFT EDGE
 		levelId = levelLinks[LEFT];
 		changeLevel();
+		player->setLinkedPlatform(-1);
 		player->setTileMap(map);
 		player->posCharacter.x = map->getNumTilesX()*map->getTileSize() - player->characterSize.x;
 	}
 	else if (player->posCharacter.x + player->characterSize.x >= map->getNumTilesX()*map->getTileSize()) { //COLLISION WITH RIGHT EDGE
 		levelId = levelLinks[RIGHT];
 		changeLevel();
+		player->setLinkedPlatform(-1);
 		player->setTileMap(map);
 		player->posCharacter.x = 0;
 	}
@@ -278,12 +280,14 @@ void Scene::update(int deltaTime)
 	else if (player->posCharacter.y < 0) { //COLISION WITH TOP EDGE	
 		levelId = levelLinks[TOP];
 		changeLevel();
+		player->setLinkedPlatform(-1);
 		player->setTileMap(map);
 		player->posCharacter.y = map->getNumTilesY()*map->getTileSize() - player->characterSize.y;
 	}
 	else if (player->posCharacter.y + player->characterSize.y >= map->getNumTilesY()*map->getTileSize()) { //COLLISION WITH BOTTOM EDGE
 		levelId = levelLinks[BOTTOM];
 		changeLevel();
+		player->setLinkedPlatform(-1);
 		player->setTileMap(map);
 		player->posCharacter.y = 0;
 	}
@@ -346,3 +350,9 @@ bool Scene::checkColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec
 	return true;
 }
 
+bool Scene::checkColisionPlatform(int x1, int x2, int y, glm::ivec2 t1, glm::ivec2 t2) {
+
+	if ((x1 > t1.x || x2 > t1.x) && (x1 < t2.x || x2 < t2.x) && y >t1.y && y < t2.y) return true;
+
+	return false;
+}

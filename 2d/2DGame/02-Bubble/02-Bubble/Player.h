@@ -27,6 +27,7 @@ public:
 	bool isJumping();
 	void setJumping(bool jump);
 	int getLinkedPlatform();
+	int getBase();
 	void setLinkedPlatform(int pltaform);
 	
 private:
