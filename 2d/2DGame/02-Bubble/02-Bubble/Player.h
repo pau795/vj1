@@ -5,7 +5,7 @@
 #include "Sprite.h"
 #include "TileMap.h"
 #include "Character.h"
-
+#include <irrKlang.h>
 
 // Player is basically a Sprite that represents the player. As such it has
 // all properties it needs to track its movement, jumping, and collisions.
@@ -29,6 +29,7 @@ public:
 	int getLinkedPlatform();
 	int getBase();
 	void setLinkedPlatform(int pltaform);
+	irrklang::ISoundEngine* soundEngine;
 	
 private:
 	bool bJumping;

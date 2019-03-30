@@ -14,6 +14,7 @@
 #include "MovingPlatform.h"
 #include "ConveyorBelt.h"
 #include <GL/glut.h>
+#include <irrKlang.h>
 
 
 #define SCREEN_X 0
@@ -161,6 +162,7 @@ void Scene::changeLevel() {
 	file.append(".txt");
 	map = TileMap::createTileMap(file, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	loadLevel();
+	soundEngine->play2D("sounds/music1.ogg", true);
 }
 
 void Scene::init()
@@ -168,10 +170,12 @@ void Scene::init()
 	initShaders();
 	levelId = 1;
 	deathTimer = -1;
+	soundEngine = irrklang::createIrrKlangDevice();
 	changeLevel();
 	player = new Player();
 	player->setTileMap(map);
 	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	player->soundEngine = soundEngine;
 	for(unsigned int i =0; i< platforms.size(); ++i) platforms[i]->player = player;
 	projection = glm::ortho(0.f, float(320 - 1), float(240 - 1), 0.f);
 	currentTime = 0.0f;
@@ -183,7 +187,8 @@ void Scene::update(int deltaTime)
 	//UPDATE ENEMIES
 	for (unsigned int i = 0; i < enemies.size(); ++i) {
 		enemies[i]->update(deltaTime);
-		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, enemies[i]->posCharacter, enemies[i]->posCharacter + enemies[i]->characterSize)) {
+		if (!player->isDead && checkColision(player->posCharacter, player->posCharacter + player->characterSize, enemies[i]->posCharacter, enemies[i]->posCharacter + enemies[i]->characterSize)) {
+			soundEngine->play2D("sounds/hurt.ogg");
 			player->isDead = true;
 			player->changeDeadSprite();
 		}
@@ -194,6 +199,7 @@ void Scene::update(int deltaTime)
 			checkPoints[i]->posObject, checkPoints[i]->posObject + checkPoints[i]->objectSize)){
 			if (currentCheckPoint != NULL) currentCheckPoint->desactivateCheckPoint();
 			checkPoints[i]->activateCheckPoint(levelId, player->sprite->animation(), player->getGravity());
+			soundEngine->play2D("sounds/save.ogg");
 			currentCheckPoint = checkPoints[i];
 		}
 		checkPoints[i]->update(deltaTime);
@@ -243,7 +249,7 @@ void Scene::update(int deltaTime)
 	}
 	//CHECK RESPAWN CONDITIONS
 	if (deathTimer > 0) --deathTimer;
-	if (deathTimer == -1 && player->isDead) deathTimer = 30;
+	if (deathTimer == -1 && player->isDead) deathTimer = 40;
 	if (deathTimer == 0) {
 		player->isDead = false;
 		player->setGravity(currentCheckPoint->getGravity());

@@ -10,6 +10,7 @@
 #include "MovingPlatform.h"
 #include "ConveyorBelt.h"
 #include "CheckPoint.h"
+#include <irrKlang.h>
 
 
 // Scene contains all the entities of our game.
@@ -29,6 +30,7 @@ public:
 	bool checkColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2);
 	bool checkColisionPlatform(int x1, int x2, int y, glm::ivec2 t1, glm::ivec2 t2);
 	void changeLevel();
+	irrklang::ISoundEngine* soundEngine;
 
 private:
 	void initShaders();

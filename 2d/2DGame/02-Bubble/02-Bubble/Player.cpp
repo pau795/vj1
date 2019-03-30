@@ -80,6 +80,8 @@ void Player::setJumping(bool jump) {
 void Player::flipGravity() {
 	bJumping = true;
 	fall_step *= -1;
+	if (fall_step > 0) soundEngine->play2D("sounds/jump2.ogg");
+	else soundEngine->play2D("sounds/jump.ogg");
 	changeJumpingSprite();
 }
 
@@ -123,6 +125,7 @@ void Player::update(int deltaTime)
 				posCharacter.x += 2;
 			else if (map->collisionMoveLeft(posCharacter, glm::ivec2(characterSize.x, characterSize.y)) == -1) {
 				isDead = true;
+				soundEngine->play2D("sounds/hurt.ogg");
 				changeDeadSprite();
 			}
 		}
@@ -141,6 +144,7 @@ void Player::update(int deltaTime)
 				posCharacter.x -= 2;
 			else if (map->collisionMoveRight(posCharacter, glm::ivec2(characterSize.x, characterSize.y)) == -1) {
 				isDead = true;
+				soundEngine->play2D("sounds/hurt.ogg");
 				changeDeadSprite();
 			}
 		}
@@ -165,6 +169,7 @@ void Player::update(int deltaTime)
 		}
 		else if (map->collisionMoveDown(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y) == -1) {
 			isDead = true;
+			soundEngine->play2D("sounds/hurt.ogg");
 			changeDeadSprite();
 		}
 		else if (map->collisionMoveUp(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y) == 1) {
@@ -174,6 +179,7 @@ void Player::update(int deltaTime)
 		}
 		else if (map->collisionMoveUp(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y) == -1) {
 			isDead = true;
+			soundEngine->play2D("sounds/hurt.ogg");
 			changeDeadSprite();
 		}
 	}
