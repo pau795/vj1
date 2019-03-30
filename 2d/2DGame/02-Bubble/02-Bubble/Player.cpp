@@ -165,7 +165,14 @@ void Player::update(int deltaTime)
 		if (map->collisionMoveDown(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y)==1) {
 			bJumping = false;
 			changeLandingSprite();
-			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) flipGravity();
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+				Game::instance().specialKeyUsed(GLUT_KEY_UP);
+				flipGravity();
+			}
+			else if (Game::instance().getKey(KEY_SPACEBAR)) {
+				Game::instance().keyUsed(KEY_SPACEBAR);
+				flipGravity();
+			}
 		}
 		else if (map->collisionMoveDown(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y) == -1) {
 			isDead = true;
@@ -175,7 +182,14 @@ void Player::update(int deltaTime)
 		else if (map->collisionMoveUp(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y) == 1) {
 			bJumping = false;
 			changeLandingSprite();
-			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) flipGravity();
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+				Game::instance().specialKeyUsed(GLUT_KEY_UP);
+				flipGravity();
+			}
+			else if (Game::instance().getKey(KEY_SPACEBAR)) {
+				Game::instance().keyUsed(KEY_SPACEBAR);
+				flipGravity();
+			}
 		}
 		else if (map->collisionMoveUp(posCharacter, glm::ivec2(characterSize.x, characterSize.y), &posCharacter.y) == -1) {
 			isDead = true;

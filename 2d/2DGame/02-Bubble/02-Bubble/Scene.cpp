@@ -162,7 +162,7 @@ void Scene::changeLevel() {
 	file.append(".txt");
 	map = TileMap::createTileMap(file, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	loadLevel();
-	soundEngine->play2D("sounds/music1.ogg", true);
+	if (!soundEngine->isCurrentlyPlaying("sounds/music1.ogg")) soundEngine->play2D("sounds/music1.ogg", true);
 }
 
 void Scene::init()
@@ -216,7 +216,14 @@ void Scene::update(int deltaTime)
 			player->setLinkedPlatform(i);
 			colision = true;
 			platforms[i]->playerLinked = true;
-			if (Game::instance().getSpecialKey(GLUT_KEY_UP) || Game::instance().getKey(KEY_SPACEBAR)) player->flipGravity();
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+				Game::instance().specialKeyUsed(GLUT_KEY_UP);
+				player->flipGravity();
+			}
+			else if (Game::instance().getKey(KEY_SPACEBAR)) {
+				Game::instance().keyUsed(KEY_SPACEBAR);
+				player->flipGravity();
+			}
 		}
 		if (!colision && player->getLinkedPlatform() >= 0) {
 			platforms[player->getLinkedPlatform()]->playerLinked = false;
