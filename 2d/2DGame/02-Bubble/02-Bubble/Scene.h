@@ -11,6 +11,7 @@
 #include "ConveyorBelt.h"
 #include "CheckPoint.h"
 #include <irrKlang.h>
+#include "TexturedQuad.h"
 
 
 // Scene contains all the entities of our game.
@@ -49,6 +50,8 @@ private:
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
+	TexturedQuad *background;
+	Texture backgroundTexture;
 
 };
 

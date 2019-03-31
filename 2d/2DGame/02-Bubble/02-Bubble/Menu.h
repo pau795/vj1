@@ -24,7 +24,11 @@ public:
 	void update(int deltaTime);
 	void render();
 	bool playGame();
+	void setPlayGame(bool b);
 	bool quitGame();
+	void setOptions(vector<string> a);
+	void setState(int state);
+	int getState();
 
 private:
 	void initShaders();
@@ -35,6 +39,8 @@ private:
 	Texture backgroundTexture;
 	Texture pointerTexture;
 	vector<string> options;
+	//state of the menu: 0 - Main Menu, 1 - Instructions, 2 - Credits, 3 - Exit Menu
+	int state;
 	int selected;
 	int choosen;
 	bool play;

@@ -40,8 +40,20 @@ void Game::render()
 
 void Game::keyPressed(int key)
 {
-	if(key == 27) // Escape code
-		bPlay = false;
+	if (key == 27) // Escape code
+		if (menu.playGame()) {
+			menu.setOptions({ "No","Yes" });
+			menu.setState(3);
+			menu.setPlayGame(false);
+		}
+		else {
+			if (menu.getState() == 0) bPlay = false;
+			if (menu.getState() == 1 || menu.getState() == 2) {
+				menu.setOptions({ "Play","Instructions", "Credits","Exit" });
+				menu.setState(0);
+			}
+			else if(menu.getState() == 3) menu.setPlayGame(true);
+		}
 	keys[key] = true;
 }
 

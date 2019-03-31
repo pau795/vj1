@@ -20,6 +20,7 @@
 #define SCREEN_X 0
 #define SCREEN_Y 0
 #define KEY_SPACEBAR 32
+int movement = 0;
 
 enum LevelDirections {
 	LEFT, RIGHT, TOP, BOTTOM
@@ -179,6 +180,9 @@ void Scene::init()
 	for(unsigned int i =0; i< platforms.size(); ++i) platforms[i]->player = player;
 	projection = glm::ortho(0.f, float(320 - 1), float(240 - 1), 0.f);
 	currentTime = 0.0f;
+
+	backgroundTexture.loadFromFile("images/scene-background.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	backgroundTexture.setMagFilter(GL_NEAREST);
 }
 
 void Scene::update(int deltaTime)
@@ -317,6 +321,11 @@ void Scene::render()
 	modelview = glm::mat4(1.0f);
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(320), float(240)) };
+	glm::vec2 texCoords[2] = { glm::vec2(0+(movement / 1000.0), 0.f), glm::vec2(float(1+(movement/1000.0)), 1.f) };
+	background = TexturedQuad::createTexturedQuad(geom, texCoords, texProgram);
+	background->render(backgroundTexture);
+	movement += 1%1000;
 	map->render();
 	for (unsigned int i = 0; i < enemies.size(); ++i) enemies[i]->render();
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->render();
