@@ -56,6 +56,16 @@ void Chunk::init(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProg
 	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + posObject.x), float(tileMapDispl.y + posObject.y)));
 }
 
+void Chunk::initGravityLine(int id, const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram) {
+	string file = "data/gravityLine";
+	file.append(to_string(id));
+	file.append(".txt");
+	string fileSpriteSheet = "images/tiles.png";
+	loadObject(file, shaderProgram);
+	tileMapDispl = tileMapPos;
+	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + posObject.x), float(tileMapDispl.y + posObject.y)));
+}
+
 void Chunk::update(int deltaTime) {
 	sprite->update(deltaTime);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posObject.x), float(tileMapDispl.y + posObject.y)));

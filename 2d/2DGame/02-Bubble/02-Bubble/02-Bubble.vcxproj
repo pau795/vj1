@@ -20,6 +20,7 @@
     <ClInclude Include="EnemyHor.h" />
     <ClInclude Include="EnemyVer.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GravityLine.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MovingPlatform.h" />
     <ClInclude Include="Object.h" />
@@ -45,6 +46,7 @@
     <ClCompile Include="EnemyHor.cpp" />
     <ClCompile Include="EnemyVer.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GravityLine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="MovingPlatform.cpp" />

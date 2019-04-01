@@ -372,6 +372,14 @@ bool Scene::checkColision(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec
 	return true;
 }
 
+bool Scene::checkColisionGravityLine(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2) {
+
+	if (p2.x < t1.x || p1.x > t2.x) return true;
+	if (p2.y < t1.y || p1.y > t2.y) return true;
+
+	return false;
+}
+
 bool Scene::checkColisionPlatform(int x1, int x2, int y, glm::ivec2 t1, glm::ivec2 t2) {
 
 	if ((x1 > t1.x || x2 > t1.x) && (x1 < t2.x || x2 < t2.x) && y >t1.y && y < t2.y) return true;
