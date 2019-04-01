@@ -155,6 +155,40 @@ bool Scene::loadLevel() {
 		c->isRight = auxIsRight;
 		conveyorBelts[i] = c;
 	}
+	//LOAD GRAVITY LINES HORIZONTAL
+	getline(fin, line);
+	sstream.str(line);
+	int numGravityLines;
+	sstream >> numGravityLines;
+	gravityLines.clear();
+	gravityLines.resize(numGravityLines);
+	for (int i = 0; i < numGravityLines; ++i) {
+		getline(fin, line);
+		sstream.str(line);
+		int id, size, x, y;
+		sstream >> id >> size >> x >> y;
+		GravityLine* gl = new GravityLine();
+		gl->init(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		gl->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		gravityLines[i] = gl;
+	}
+	//LOAD GRAVITY LINES VERTICAL
+	getline(fin, line);
+	sstream.str(line);
+	int numGravityLines2;
+	sstream >> numGravityLines2;
+	gravityLines2.clear();
+	gravityLines2.resize(numGravityLines2);
+	for (int i = 0; i < numGravityLines2; ++i) {
+		getline(fin, line);
+		sstream.str(line);
+		int id, size, x, y;
+		sstream >> id >> size >> x >> y;
+		GravityLine* gl = new GravityLine();
+		gl->init2(id, size, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		gl->setPosition2(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		gravityLines2[i] = gl;
+	}
 }
 
 void Scene::changeLevel() {
@@ -309,6 +343,51 @@ void Scene::update(int deltaTime)
 		player->posCharacter.y = 0;
 	}
 	player->update(deltaTime);
+
+	//CHECK GRAVITY LINE HOR
+	for (unsigned int i = 0; i < gravityLines.size(); ++i) {
+		gravityLines[i]->update(deltaTime);
+		int n = player->getGravity();
+		if (n <= 0 && !gravityLines[i]->used) {
+			if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, gravityLines[i]->posObject, gravityLines[i]->posObject + gravityLines[i]->objectSize)) {
+				player->changeLandingSprite();
+				player->flipGravity();
+				gravityLines[i]->used = true;
+			}
+		}
+		else if (n >= 0 && !gravityLines[i]->used) {
+			if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, gravityLines[i]->posObject, gravityLines[i]->posObject + gravityLines[i]->objectSize)) {
+				player->changeLandingSprite();
+				player->flipGravity();
+				gravityLines[i]->used = true;
+			}
+		}
+		if (checkColisionGravityLine(player->posCharacter, player->posCharacter + player->characterSize, gravityLines[i]->posObject, gravityLines[i]->posObject + gravityLines[i]->objectSize)) {
+			gravityLines[i]->used = false;
+		}
+	}
+	//CHECK GRAVITY LINE VER
+	for (unsigned int i = 0; i < gravityLines2.size(); ++i) {
+		gravityLines2[i]->update(deltaTime);
+		int n = player->getGravity();
+		if (n <= 0 && !gravityLines2[i]->used) {
+			if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, gravityLines2[i]->posObject, gravityLines2[i]->posObject + gravityLines2[i]->objectSize)) {
+				player->changeLandingSprite();
+				player->flipGravity();
+				gravityLines2[i]->used = true;
+			}
+		}
+		else if (n >= 0 && !gravityLines2[i]->used) {
+			if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, gravityLines2[i]->posObject, gravityLines2[i]->posObject + gravityLines2[i]->objectSize)) {
+				player->changeLandingSprite();
+				player->flipGravity();
+				gravityLines2[i]->used = true;
+			}
+		}
+		if (checkColisionGravityLine(player->posCharacter, player->posCharacter + player->characterSize, gravityLines2[i]->posObject, gravityLines2[i]->posObject + gravityLines2[i]->objectSize)) {
+			gravityLines2[i]->used = false;
+		}
+	}
 }
 
 void Scene::render()
@@ -331,6 +410,8 @@ void Scene::render()
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->render();
 	for (unsigned int i = 0; i < platforms.size(); ++i) platforms[i]->render();
 	for (unsigned int i = 0; i < conveyorBelts.size(); ++i) conveyorBelts[i]->render();
+	for (unsigned int i = 0; i < gravityLines.size(); ++i) gravityLines[i]->render();
+	for (unsigned int i = 0; i < gravityLines2.size(); ++i) gravityLines2[i]->render();
 	player->render();
 }
 
