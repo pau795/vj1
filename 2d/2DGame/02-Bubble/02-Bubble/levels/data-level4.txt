@@ -1,0 +1,16 @@
+-1 5 3 -1 
+0 			//enemies
+2 			//checkpoints
+1 6 7 
+1 5 24 
+0  			//moving platforms
+2			//conveyor belt
+4 1 23 11 3 
+4 1 23 11 9 
+0 			//gravity lines hor
+4			//gravity lines ver
+2 5 32 14 
+2 5 15 14 
+2 5 10 21  
+2 5 26 21 
+0 

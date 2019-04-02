@@ -100,7 +100,7 @@ bool Scene::loadLevel() {
 		CheckPoint* c = new CheckPoint();
 		if (currentCheckPoint != NULL && currentCheckPoint->getLevel() == levelId && currentCheckPoint->id == i)
 			c = currentCheckPoint;
-		else{
+		else {
 			c->init(orientation, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 			c->id = i;
 			c->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
@@ -118,8 +118,8 @@ bool Scene::loadLevel() {
 	for (int i = 0; i < numPlatforms; ++i) {
 		getline(fin, line);
 		sstream.str(line);
-		int id, type, size, speed,  p1x, p1y, p2x, p2y;
-		sstream >> id >> type >> size >>speed >> p1x >> p1y >> p2x >> p2y;
+		int id, type, size, speed, p1x, p1y, p2x, p2y;
+		sstream >> id >> type >> size >> speed >> p1x >> p1y >> p2x >> p2y;
 		MovingPlatform* p;
 		if (type == 0) {
 			p = new MovingPlatformHor();
@@ -189,6 +189,22 @@ bool Scene::loadLevel() {
 		gl->setPosition2(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
 		gravityLines2[i] = gl;
 	}
+	getline(fin, line);
+	sstream.str(line);
+	int numTargets;
+	sstream >> numTargets;
+	targets.clear();
+	targets.resize(numTargets);
+	for (int i = 0; i < targets.size(); ++i) {
+		getline(fin, line);
+		sstream.str(line);
+		int id, x, y;
+		sstream >> id >> x >> y;
+		Target* t = new Target();
+		t->init(id, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+		t->setPosition(glm::vec2(x * map->getTileSize(), y * map->getTileSize()));
+		targets[i] = t;
+	}
 }
 
 void Scene::changeLevel() {
@@ -197,7 +213,18 @@ void Scene::changeLevel() {
 	file.append(".txt");
 	map = TileMap::createTileMap(file, glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	loadLevel();
-	if (!soundEngine->isCurrentlyPlaying("sounds/music1.ogg")) soundEngine->play2D("sounds/music1.ogg", true);
+	if (levelId < 7) {
+		if (soundEngine->isCurrentlyPlaying("sounds/music2.ogg")) {
+			soundEngine->removeSoundSource("sounds/music2.ogg");
+			soundEngine->play2D("sounds/music1.ogg", true);
+		}
+	}
+	else {
+		if (soundEngine->isCurrentlyPlaying("sounds/music1.ogg")) {
+			soundEngine->removeSoundSource("sounds/music1.ogg");
+			soundEngine->play2D("sounds/music2.ogg", true);
+		}
+	}
 }
 
 void Scene::init()
@@ -206,17 +233,19 @@ void Scene::init()
 	levelId = 1;
 	deathTimer = -1;
 	soundEngine = irrklang::createIrrKlangDevice();
+	soundEngine->setSoundVolume(0.6f);
 	changeLevel();
 	player = new Player();
 	player->setTileMap(map);
 	player->init(0, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->soundEngine = soundEngine;
-	for(unsigned int i =0; i< platforms.size(); ++i) platforms[i]->player = player;
+	for (unsigned int i = 0; i < platforms.size(); ++i) platforms[i]->player = player;
 	projection = glm::ortho(0.f, float(320 - 1), float(240 - 1), 0.f);
 	currentTime = 0.0f;
-
+	soundEngine->play2D("sounds/music1.ogg", true);
 	backgroundTexture.loadFromFile("images/scene-background.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	backgroundTexture.setMagFilter(GL_NEAREST);
+	gameFinished = false;
 }
 
 void Scene::update(int deltaTime)
@@ -234,7 +263,7 @@ void Scene::update(int deltaTime)
 	//UPDATE CHECKPOINTS
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) {
 		if (!checkPoints[i]->isActivated() && checkColision(player->posCharacter, player->posCharacter + player->characterSize,
-			checkPoints[i]->posObject, checkPoints[i]->posObject + checkPoints[i]->objectSize)){
+			checkPoints[i]->posObject, checkPoints[i]->posObject + checkPoints[i]->objectSize)) {
 			if (currentCheckPoint != NULL) currentCheckPoint->desactivateCheckPoint();
 			checkPoints[i]->activateCheckPoint(levelId, player->sprite->animation(), player->getGravity());
 			soundEngine->play2D("sounds/save.ogg");
@@ -249,8 +278,8 @@ void Scene::update(int deltaTime)
 			player->setJumping(false);
 			player->changeLandingSprite();
 			int gravity = player->getGravity();
-			if (gravity > 0 && !player->isDead) player->posCharacter.y = platforms[i]->posObject.y-player->characterSize.y-gravity;
-			else  if (!player->isDead) player->posCharacter.y = platforms[i]->posObject.y+ platforms[i]->objectSize.y-gravity;
+			if (gravity > 0 && !player->isDead) player->posCharacter.y = platforms[i]->posObject.y - player->characterSize.y - gravity;
+			else  if (!player->isDead) player->posCharacter.y = platforms[i]->posObject.y + platforms[i]->objectSize.y - gravity;
 			player->setLinkedPlatform(i);
 			colision = true;
 			platforms[i]->playerLinked = true;
@@ -274,18 +303,20 @@ void Scene::update(int deltaTime)
 		conveyorBelts[i]->update(deltaTime);
 		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize, conveyorBelts[i]->posObject, conveyorBelts[i]->posObject + conveyorBelts[i]->objectSize)) {
 			int drag;
-			if (conveyorBelts[i]->isRight) drag= deltaTime / 10;
+			if (conveyorBelts[i]->isRight) drag = deltaTime / 10;
 			else drag = -deltaTime / 10;
 			player->posCharacter.x += drag;
-			if (map->collisionMoveLeft(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == 1)
+			if (!player->isDead && map->collisionMoveLeft(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == 1)
 				player->posCharacter.x -= drag;
-			else if (map->collisionMoveLeft(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
+			else if (!player->isDead && map->collisionMoveLeft(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
+				soundEngine->play2D("sounds/hurt.ogg");
 				player->isDead = true;
 				player->changeDeadSprite();
 			}
-			else if (map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == 1)
+			else if (!player->isDead && map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == 1)
 				player->posCharacter.x -= drag;
-			else if (map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
+			else if (!player->isDead && map->collisionMoveRight(player->posCharacter, glm::ivec2(player->characterSize.x, player->characterSize.y)) == -1) {
+				soundEngine->play2D("sounds/hurt.ogg");
 				player->isDead = true;
 				player->changeDeadSprite();
 			}
@@ -388,6 +419,18 @@ void Scene::update(int deltaTime)
 			gravityLines2[i]->used = false;
 		}
 	}
+
+	//CHECK TARGET
+
+	for (unsigned int i = 0; i < targets.size(); ++i) {
+		if (checkColision(player->posCharacter, player->posCharacter + player->characterSize,
+			targets[i]->posObject, targets[i]->posObject + targets[i]->objectSize)) {
+			soundEngine->removeAllSoundSources();
+			gameFinished = true;
+			soundEngine->play2D("sounds/success.ogg");
+		}
+		targets[i]->update(deltaTime);
+	}
 }
 
 void Scene::render()
@@ -401,10 +444,10 @@ void Scene::render()
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 	glm::vec2 geom[2] = { glm::vec2(0.f, 0.f), glm::vec2(float(320), float(240)) };
-	glm::vec2 texCoords[2] = { glm::vec2(0+(movement / 1000.0), 0.f), glm::vec2(float(1+(movement/1000.0)), 1.f) };
+	glm::vec2 texCoords[2] = { glm::vec2(0 + (movement / 1000.0), 0.f), glm::vec2(float(1 + (movement / 1000.0)), 1.f) };
 	background = TexturedQuad::createTexturedQuad(geom, texCoords, texProgram);
 	background->render(backgroundTexture);
-	movement += 1%1000;
+	movement += 1 % 1000;
 	map->render();
 	for (unsigned int i = 0; i < enemies.size(); ++i) enemies[i]->render();
 	for (unsigned int i = 0; i < checkPoints.size(); ++i) checkPoints[i]->render();
@@ -412,6 +455,7 @@ void Scene::render()
 	for (unsigned int i = 0; i < conveyorBelts.size(); ++i) conveyorBelts[i]->render();
 	for (unsigned int i = 0; i < gravityLines.size(); ++i) gravityLines[i]->render();
 	for (unsigned int i = 0; i < gravityLines2.size(); ++i) gravityLines2[i]->render();
+	for (unsigned int i = 0; i < targets.size(); ++i) targets[i]->render();
 	player->render();
 }
 
@@ -463,7 +507,7 @@ bool Scene::checkColisionGravityLine(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1
 
 bool Scene::checkColisionPlatform(int x1, int x2, int y, glm::ivec2 t1, glm::ivec2 t2) {
 
-	if ((x1 > t1.x || x2 > t1.x) && (x1 < t2.x || x2 < t2.x) && y >t1.y && y < t2.y) return true;
+	if ((x1 > t1.x || x2 > t1.x) && (x1 < t2.x || x2 < t2.x) && y > t1.y && y < t2.y) return true;
 
 	return false;
 }

@@ -1,0 +1,10 @@
+2 13 7 -1 				//adjacent level id -> left right top bottom
+0 
+1 						//num Checkpoints
+1 4 24 						
+0  						//num Moving Platforms
+0 						//num Conveyor Belts
+0						//num horizontal gravity lines
+0 						//num vertical gavity lines
+1						//targets
+1 31 13 

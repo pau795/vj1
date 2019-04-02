@@ -19,6 +19,12 @@ bool Game::update(int deltaTime)
 			initScene = true;
 		}
 		scene.update(deltaTime);
+		if (scene.gameFinished) {
+			menu.setPlayGame(false);
+			initScene = false;		
+			menu.setOptions({ "Back" });
+			menu.setState(2);
+		}
 	}
 	else {
 		menu.update(deltaTime);

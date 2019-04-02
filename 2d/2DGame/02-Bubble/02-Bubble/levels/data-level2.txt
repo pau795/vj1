@@ -1,0 +1,11 @@
+3 1 -1 -1 				//adjacent level id -> left right top bottom
+0 						//num enemies in the level
+1						//num Checkpoints			
+2 2 18 
+2  						//num Moving Platforms
+1 0 6 2 11 6 29 6   	//platform i definition -> id, type, size, speed, tileX, tileY, patrolX, PatrolY 
+1 0 6 2 2 23 15 23  
+0 						//num Conveyor Belts
+0 
+0 
+0 

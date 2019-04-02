@@ -13,6 +13,7 @@
 #include <irrKlang.h>
 #include "TexturedQuad.h"
 #include "GravityLine.h"
+#include "target.h"
 
 
 // Scene contains all the entities of our game.
@@ -34,6 +35,7 @@ public:
 	bool checkColisionGravityLine(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 t1, glm::ivec2 t2);
 	void changeLevel();
 	irrklang::ISoundEngine* soundEngine;
+	bool gameFinished;
 
 private:
 	void initShaders();
@@ -47,6 +49,7 @@ private:
 	vector<ConveyorBelt*> conveyorBelts;
 	vector<GravityLine*> gravityLines;
 	vector<GravityLine*> gravityLines2;
+	vector<Target*> targets;
 	CheckPoint *currentCheckPoint;
 	int levelId;
 	int deathTimer;
