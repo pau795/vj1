@@ -175,7 +175,7 @@ void Menu::render()
 			text.render("Credits", glm::vec2(40, 50), 32, glm::vec4(0.2, 0.8, 0.2, 1));
 			text.render("Game created by:", glm::vec2(50, 100), 20, glm::vec4(1, 1, 1, 1));
 			text.render("Pablo Navarro", glm::vec2(80, 140), 20, glm::vec4(1, 1, 1, 1));
-			text.render("Ferran Vallès", glm::vec2(80, 180), 20, glm::vec4(1, 1, 1, 1));
+			text.render("Ferran Valles", glm::vec2(80, 180), 20, glm::vec4(1, 1, 1, 1));
 			text.render("Videogames Project, Spring 2019.", glm::vec2(50, 220), 20, glm::vec4(1, 1, 1, 1));
 			text.render("FIB, UPC.", glm::vec2(50, 260), 20, glm::vec4(1, 1, 1, 1));
 			for (unsigned int i = 0; i < options.size(); ++i) {
